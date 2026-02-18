@@ -1,0 +1,169 @@
+{% extends "admin/base.html" %}
+{% block body %}
+<h2 class="mb-4">Dashboard</h2>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Hero Videos (horizontal)</h5>
+          <a class="btn btn-sm btn-warning" href="{{ url_for('admin.hero_add') }}">Add</a>
+        </div>
+        <hr>
+        {% if hero_videos %}
+          <div class="list-group">
+            {% for v in hero_videos %}
+              <div class="list-group-item d-flex justify-content-between align-items-center" style="background:#0f0f0f; border-color: rgba(255,255,255,.08); color:#fff;">
+                <div>
+                  <div><strong>#{{ v.position }}</strong> — {{ v.title }}</div>
+                  <div class="text-muted small">Overlay: {{ v.overlay_top }} | {{ v.overlay_title }}</div>
+                  <div class="text-muted small">{{ v.file_path }}</div>
+                </div>
+                <form method="post" action="{{ url_for('admin.hero_delete', item_id=v.id) }}">
+                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove?')">Excluir</button>
+                </form>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No videos yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Showreel</h5>
+          <a class="btn btn-sm btn-warning" href="{{ url_for('admin.showreel_upload') }}">Atualizar</a>
+        </div>
+        <hr>
+        {% if showreel %}
+          <div class="text-muted small">{{ showreel.title }}</div>
+          <div class="text-muted small">{{ showreel.file_path }}</div>
+        {% else %}
+          <p class="text-muted mb-0">Nenhum showreel enviado.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Social Links (icons)</h5>
+          <a class="btn btn-sm btn-warning" href="{{ url_for('admin.socials_add') }}">Add</a>
+        </div>
+        <hr>
+        {% if socials %}
+          <div class="list-group">
+            {% for s in socials %}
+              <div class="list-group-item d-flex justify-content-between align-items-center" style="background:#0f0f0f; border-color: rgba(255,255,255,.08); color:#fff;">
+                <div>
+                  <div><strong>#{{ s.position }}</strong> — {{ s.name }}</div>
+                  <div class="text-muted small">{{ s.url }}</div>
+                  <div class="text-muted small">{{ s.icon_class }}</div>
+                </div>
+                <form method="post" action="{{ url_for('admin.socials_delete', item_id=s.id) }}">
+                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove?')">Excluir</button>
+                </form>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">Nenhuma rede social cadastrada ainda.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Clients (Logos)</h5>
+          <a class="btn btn-sm btn-warning" href="{{ url_for('admin.clients_add') }}">Add</a>
+        </div>
+        <hr>
+        {% if client_logos %}
+          <div class="list-group">
+            {% for c in client_logos %}
+              <div class="list-group-item d-flex justify-content-between align-items-center" style="background:#0f0f0f; border-color: rgba(255,255,255,.08); color:#fff;">
+                <div>
+                  <div><strong>#{{ c.position }}</strong> — {{ c.name }}</div>
+                  <div class="text-muted small">{{ c.file_path }}</div>
+                </div>
+                <form method="post" action="{{ url_for('admin.clients_delete', item_id=c.id) }}">
+                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove?')">Excluir</button>
+                </form>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">Nenhuma logo ainda.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Instagram Photos (apenas fotos)</h5>
+          <a class="btn btn-sm btn-warning" href="{{ url_for('admin.instagram_add') }}">Add</a>
+        </div>
+        <hr>
+        {% if ig_photos %}
+          <div class="list-group">
+            {% for p in ig_photos %}
+              <div class="list-group-item d-flex justify-content-between align-items-center" style="background:#0f0f0f; border-color: rgba(255,255,255,.08); color:#fff;">
+                <div>
+                  <div><strong>#{{ p.position }}</strong></div>
+                  <div class="text-muted small">{{ p.file_path }}</div>
+                </div>
+                <form method="post" action="{{ url_for('admin.instagram_delete', item_id=p.id) }}">
+                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove?')">Excluir</button>
+                </form>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">Nenhuma foto ainda.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Works (Videos) — uploads existentes</h5>
+          <a class="btn btn-sm btn-warning" href="{{ url_for('admin.works_add') }}">Add</a>
+        </div>
+        <hr>
+        {% if works_videos %}
+          <div class="list-group">
+            {% for g in works_videos %}
+              <div class="list-group-item d-flex justify-content-between align-items-center" style="background:#0f0f0f; border-color: rgba(255,255,255,.08); color:#fff;">
+                <div>
+                  <div><strong>#{{ g.position }}</strong> — {{ g.title }}</div>
+                  <div class="text-muted small">{{ g.file_path }}</div>
+                </div>
+                <form method="post" action="{{ url_for('admin.works_delete', item_id=g.id) }}">
+                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove?')">Excluir</button>
+                </form>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No videos yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

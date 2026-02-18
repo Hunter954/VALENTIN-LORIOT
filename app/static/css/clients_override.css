@@ -1,0 +1,35 @@
+/* =========================================
+   CLIENTS ABSOLUTE FIX
+   DOES NOT TOUCH YOUR HTML
+   DOES NOT REMOVE YOUR LOOP
+   JUST PREVENTS CLIPPING
+   ========================================= */
+
+/* Force everything inside clients to never clip */
+#clients,
+#clients * {
+  overflow: visible !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/* Layout */
+#clients .clients-logos,
+#clients .clients-track,
+#clients .clients-row,
+#clients .clients-marquee {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 80px !important;
+}
+
+/* Logo sizing */
+#clients img {
+  height: 60px !important;
+  width: auto !important;
+  max-width: 240px !important;
+  object-fit: contain !important;
+  display: block !important;
+}

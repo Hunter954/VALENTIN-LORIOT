@@ -1,0 +1,9 @@
+<section id="clients">
+  <h2 class="section-title">CLIENTS</h2>
+
+  <div class="clients-logos">
+    {% for c in clients %}
+      <img src="{{ url_for('static', filename=c.logo_path) }}" alt="{{ c.name or 'Client' }}">
+    {% endfor %}
+  </div>
+</section>

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Admin - Portfolio</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b0b0b;
+      --panel: #121212;
+      --panel2: #0f0f0f;
+      --line: rgba(255,255,255,.08);
+      --text: #f0f0f0;
+      --muted: rgba(255,255,255,.65);
+      --accent: #f1c40f;
+    }
+    body{ background:var(--bg) !important; color:var(--text) !important; }
+    a{ text-decoration:none; }
+
+    /* layout */
+    .admin-shell{ display:flex; min-height:100vh; }
+    .admin-sidebar{
+      width: 270px;
+      background: linear-gradient(to bottom, #0e0e0e, #0b0b0b);
+      border-right: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 18px 14px;
+    }
+    .admin-brand{
+      display:flex; align-items:center; gap:10px;
+      padding: 10px 10px 14px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 14px;
+    }
+    .admin-mark{
+      width:36px; height:36px; border: 1px solid rgba(255,255,255,.18);
+      border-radius: 10px; display:grid; place-items:center; font-weight:800;
+    }
+    .admin-title{ font-weight:800; letter-spacing:.06em; }
+    .admin-sub{ color: var(--muted); font-size: 12px; margin-top:2px; }
+
+    .nav-pill{ display:flex; flex-direction:column; gap:6px; }
+    .nav-pill a{
+      padding: 10px 10px;
+      border-radius: 12px;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid transparent;
+    }
+    .nav-pill a:hover{ background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.06); }
+    .nav-pill .active{ background: rgba(241,196,15,.12); border-color: rgba(241,196,15,.25); }
+
+    .admin-actions{ margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); display:flex; gap:8px; flex-wrap:wrap; }
+    .btn-accent{ background: var(--accent) !important; color:#000 !important; border:0 !important; }
+    .btn-ghost{ background: transparent !important; border: 1px solid rgba(255,255,255,.14) !important; color: var(--text) !important; }
+
+    .admin-main{ flex:1; }
+    .admin-topbar{
+      position: sticky; top:0; z-index: 10;
+      background: rgba(11,11,11,.72);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 18px;
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+    }
+    .admin-content{ padding: 18px; }
+
+    /* components */
+    .form-text{ color: rgb(179 179 179) !important; }
+    .card{ background:var(--panel) !important; border-color: var(--line) !important; }
+    .table{ --bs-table-bg: transparent; --bs-table-color: var(--text); }
+    .table td, .table th{ border-color: var(--line) !important; }
+    .form-control, .form-select{
+      background:var(--panel2);
+      border-color: rgba(255,255,255,.12);
+      color:var(--text);
+    }
+    .form-control:focus{ background:var(--panel2); color:#fff; border-color: rgba(241,196,15,.45); box-shadow:none; }
+    .text-muted{ color: var(--muted) !important; }
+    .list-group-item{ background:var(--panel2) !important; border-color: var(--line) !important; color: var(--text) !important; }
+  </style>
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a class="admin-brand" href="{{ url_for('admin.dashboard') }}">
+      <div class="admin-mark">A</div>
+      <div>
+        <div class="admin-title">ADMIN</div>
+        <div class="admin-sub">Painel do site</div>
+      </div>
+    </a>
+
+    {% if current_user.is_authenticated %}
+    <div class="nav-pill">
+      <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint=='admin.dashboard' %}active{% endif %}"><i class="fa-solid fa-grid-2" style="width:18px;"></i> Dashboard</a>
+      <a href="{{ url_for('admin.hero_add') }}" class="{% if request.endpoint in ['admin.hero_add'] %}active{% endif %}"><i class="fa-solid fa-film" style="width:18px;"></i> Hero Videos</a>
+      <a href="{{ url_for('admin.showreel_upload') }}" class="{% if request.endpoint in ['admin.showreel_upload'] %}active{% endif %}"><i class="fa-solid fa-clapperboard" style="width:18px;"></i> Showreel</a>
+      <a href="{{ url_for('admin.clients_add') }}" class="{% if request.endpoint in ['admin.clients_add'] %}active{% endif %}"><i class="fa-solid fa-handshake" style="width:18px;"></i> Clients</a>
+      <a href="{{ url_for('admin.works_add') }}" class="{% if request.endpoint in ['admin.works_add'] %}active{% endif %}"><i class="fa-solid fa-video" style="width:18px;"></i> Videos</a>
+      <a href="{{ url_for('admin.instagram_add') }}" class="{% if request.endpoint in ['admin.instagram_add'] %}active{% endif %}"><i class="fa-brands fa-instagram" style="width:18px;"></i> Instagram Photos</a>
+      <a href="{{ url_for('admin.settings') }}" class="{% if request.endpoint=='admin.settings' %}active{% endif %}"><i class="fa-solid fa-gear" style="width:18px;"></i> Settings</a>
+    </div>
+
+    <div class="admin-actions">
+      <a class="btn btn-sm btn-accent" href="{{ url_for('main.home') }}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver site</a>
+      <a class="btn btn-sm btn-ghost" href="{{ url_for('admin.logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </div>
+    {% endif %}
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-sm btn-ghost" onclick="history.back()" type="button"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <a class="btn btn-sm btn-ghost" href="{{ url_for('admin.dashboard') }}"><i class="fa-solid fa-house"></i> Dashboard</a>
+      </div>
+      <div class="text-muted small">{{ request.endpoint }}</div>
+    </div>
+
+    <div class="admin-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, msg in messages %}
+            <div class="alert alert-{{ category }} mb-3">{{ msg }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% block body %}{% endblock %}
+    </div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+</body>
+</html>

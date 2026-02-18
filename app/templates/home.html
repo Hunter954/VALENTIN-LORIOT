@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block body %}
+<header class="top-nav">
+  <div class="top-nav-inner">
+  <div class="brand">
+    {% if settings and settings.brand_logo_path %}
+      <img class="brand-logo" src="{{ settings.brand_logo_path }}" alt="{{ settings.site_title }}" />
+    {% else %}
+      <div class="brand-mark">VL</div>
+    {% endif %}
+  </div>
+  <nav class="menu">
+    <a href="#home">Home</a>
+    <a href="#works">Videos</a>
+    <a href="#about">About Us</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <div class="social">
+    {% if socials and socials|length > 0 %}
+      {% for s in socials %}
+        <a href="{{ s.url }}" aria-label="{{ s.name }}" title="{{ s.name }}">
+          <i class="{{ s.icon_class }}"></i>
+        </a>
+      {% endfor %}
+    {% else %}
+      <a href="{{ settings.instagram_url if settings else '#' }}" aria-label="Instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#" aria-label="Vimeo" title="Vimeo"><i class="fa-brands fa-vimeo"></i></a>
+      <a href="#" aria-label="WhatsApp" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+    {% endif %}
+  </div>
+  </div>
+</header>
+
+<section id="home" class="hero">
+  <div class="hero-scroller" id="heroScroller" aria-label="Hero videos">
+    {% if hero_videos|length == 0 %}
+      <div class="hero-slide">
+        <div class="hero-fallback">
+          <p>Add 3 videos in <strong>/admin</strong> → Hero Videos.</p>
+        </div>
+      </div>
+    {% else %}
+      {% for v in hero_videos %}
+      <div class="hero-slide" data-index="{{ loop.index0 }}">
+        <video class="hero-video" playsinline muted preload="metadata" loop>
+          <source src="{{ v.file_path }}" type="video/mp4">
+        </video>
+        <div class="hero-overlay">
+          <div class="hero-overlay-inner">
+            {% if v.overlay_top %}
+              <div class="hero-overlay-top">{{ v.overlay_top }}</div>
+            {% endif %}
+            <div class="hero-overlay-title">
+              {{ v.overlay_title if v.overlay_title else (settings.hero_tagline if settings else 'driving profit') }}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <div class="hero-progress" aria-hidden="true">
+    {% for i in range(1, (hero_videos|length if hero_videos|length else 3) + 1) %}
+      <div class="hero-dot">{{ i }}</div>
+    {% endfor %}
+  </div>
+
+  <div class="hero-fade-bottom"></div>
+</section>
+
+<section id="about" class="section about section-overlay">
+  <div class="section-inner">
+    <h2 class="section-title">{{ settings.about_title if settings else "VALENTIN LORIOT" }}</h2>
+    <div class="about-text">
+      {{ (settings.about_text if settings else "") | replace('\n','<br/>') | safe }}
+    </div>
+  </div>
+</section>
+
+<section id="showreel" class="section showreel">
+  <div class="showreel-inner">
+    {% if showreel %}
+      <video class="showreel-video" playsinline muted preload="metadata" loop>
+        <source src="{{ showreel.file_path }}" type="video/mp4">
+      </video>
+      <div class="showreel-overlay">
+        <h3 class="showreel-title">{{ showreel.title }}</h3>
+        <p class="showreel-sub">Showreel vibes</p>
+      </div>
+    {% else %}
+      <div class="showreel-empty">
+        <h3>Showreel vibes</h3>
+        <p>Add a showreel in <strong>/admin</strong> → Showreel.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<section id="clients" style="padding:100px 0;">
+
+  <h2 style="text-align:center;margin-bottom:60px;">CLIENTS</h2>
+
+  <div style="
+    max-width:1200px;
+    margin:0 auto;
+    padding:0 40px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    gap:80px;
+  ">
+
+    {% for client in client_logos %}
+      <img src="{{ client.file_path }}"
+           style="height:60px; width:auto; max-width:240px; object-fit:contain;">
+    {% endfor %}
+
+  </div>
+
+</section>
+
+<section id="works" class="section works">
+  <div class="section-inner">
+    <h2 class="section-title">VIDEOS</h2>
+    <div class="works-grid">
+      {% for g in works_videos %}
+        <div class="works-item">
+          <video class="works-video" playsinline muted preload="metadata" loop>
+            <source src="{{ g.file_path }}" type="video/mp4">
+          </video>
+          {% if g.title %}
+            <div class="works-item-overlay">{{ g.title }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      {% if works_videos|length == 0 %}
+        <div class="works-empty">Add videos in /admin → Works (Videos).</div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section instagram">
+  <div class="instagram-wrap">
+    <div class="instagram-grid">
+      {% for p in ig_photos %}
+        <img class="ig-photo" src="{{ p.file_path }}" alt="Instagram photo {{ loop.index }}" />
+      {% endfor %}
+      {% if ig_photos|length == 0 %}
+        <div class="ig-empty">Add photos in /admin → Instagram Photos.</div>
+      {% endif %}
+    </div>
+
+    <a class="follow-ig" href="{{ socials[0].url if (socials and socials|length>0) else (settings.instagram_url if settings else '#') }}" target="_blank" rel="noopener">
+      FOLLOW US ON INSTAGRAM
+    </a>
+  </div>
+</section>
+
+<footer id="contact" class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="brand">
+        {% if settings and settings.brand_logo_path %}
+          <img class="brand-logo" src="{{ settings.brand_logo_path }}" alt="{{ settings.site_title }}" />
+        {% else %}
+          <div class="brand-mark">VL</div>
+        {% endif %}
+      </div>
+      <div class="footer-social">
+        {% if socials and socials|length > 0 %}
+          {% for s in socials %}
+            <a href="{{ s.url }}" aria-label="{{ s.name }}" title="{{ s.name }}"><i class="{{ s.icon_class }}"></i></a>
+          {% endfor %}
+        {% else %}
+          <a href="{{ settings.instagram_url if settings else '#' }}"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-vimeo"></i></a>
+          <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>ABOUT</h4>
+      <p>{{ (settings.footer_about if settings and settings.footer_about else 'A visual storytelling studio dedicated to capturing emotion, atmosphere, and timeless narratives.') }}</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>CONTACTS</h4>
+      <p>
+        {% if settings and settings.footer_phone %}Phone: {{ settings.footer_phone }}<br>{% endif %}
+        {% if settings and settings.footer_email %}Email: {{ settings.footer_email }}{% endif %}
+        {% if (not settings or (not settings.footer_phone and not settings.footer_email)) %}
+          Phone: +55 (87) 654 321 0<br>
+          Email: support@valentinloriot.fr
+        {% endif %}
+      </p>
+      <p class="copyright">
+        {% if settings and settings.footer_copyright %}
+          {{ settings.footer_copyright }}
+        {% else %}
+          © {{ 2026 }} {{ settings.site_title if settings else "Portfolio" }}. All rights reserved.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+</footer>
+{% endblock %}

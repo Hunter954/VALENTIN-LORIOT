@@ -1,0 +1,40 @@
+/* =====================================================
+   CLIENTS FINAL FIX — STATIC / NEVER CLIPS / RESPONSIVE
+   Just include this AFTER style.css
+   ===================================================== */
+
+#clients {
+  padding: 100px 0;
+}
+
+#clients .clients-logos {
+  max-width: 1200px;
+  width: calc(100% - 80px);
+  margin: 0 auto;
+
+  display: flex;
+  flex-wrap: wrap;              /* WRAPS instead of cutting */
+  justify-content: center;
+  align-items: center;
+
+  gap: 80px;
+
+  overflow: visible !important;
+}
+
+#clients .clients-logos img {
+  height: 60px;
+  width: auto;
+  max-width: 240px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Remove ANY clipping from old marquee versions */
+.clients-marquee,
+.clients-track,
+.clients-row {
+  overflow: visible !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
