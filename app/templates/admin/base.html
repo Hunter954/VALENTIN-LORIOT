@@ -101,7 +101,11 @@
       <a href="{{ url_for('admin.hero_add') }}" class="{% if request.endpoint in ['admin.hero_add'] %}active{% endif %}"><i class="fa-solid fa-film" style="width:18px;"></i> Hero Videos</a>
       <a href="{{ url_for('admin.showreel_upload') }}" class="{% if request.endpoint in ['admin.showreel_upload'] %}active{% endif %}"><i class="fa-solid fa-clapperboard" style="width:18px;"></i> Showreel</a>
       <a href="{{ url_for('admin.clients_add') }}" class="{% if request.endpoint in ['admin.clients_add'] %}active{% endif %}"><i class="fa-solid fa-handshake" style="width:18px;"></i> Clients</a>
+      <a href="{{ url_for('admin.clients_media_add') }}" class="{% if request.endpoint in ['admin.clients_media_add'] %}active{% endif %}"><i class="fa-solid fa-photo-film" style="width:18px;"></i> Clients Media</a>
       <a href="{{ url_for('admin.works_add') }}" class="{% if request.endpoint in ['admin.works_add'] %}active{% endif %}"><i class="fa-solid fa-video" style="width:18px;"></i> Videos</a>
+      <a href="{{ url_for('admin.portfolio_photos_add') }}" class="{% if request.endpoint in ['admin.portfolio_photos_add'] %}active{% endif %}"><i class="fa-solid fa-images" style="width:18px;"></i> Portfolio Photos</a>
+      <a href="{{ url_for('admin.events_add') }}" class="{% if request.endpoint in ['admin.events_add'] %}active{% endif %}"><i class="fa-solid fa-calendar-days" style="width:18px;"></i> Events</a>
+      <a href="{{ url_for('admin.contact_messages') }}" class="{% if request.endpoint in ['admin.contact_messages'] %}active{% endif %}"><i class="fa-solid fa-envelope" style="width:18px;"></i> Contact Messages</a>
       <a href="{{ url_for('admin.instagram_add') }}" class="{% if request.endpoint in ['admin.instagram_add'] %}active{% endif %}"><i class="fa-brands fa-instagram" style="width:18px;"></i> Instagram Photos</a>
       <a href="{{ url_for('admin.settings') }}" class="{% if request.endpoint=='admin.settings' %}active{% endif %}"><i class="fa-solid fa-gear" style="width:18px;"></i> Settings</a>
     </div>
