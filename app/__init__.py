@@ -30,10 +30,6 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # If no DATABASE_URL is provided, default to a writable sqlite path (Railway-friendly)
-    app.config.setdefault("SQLALCHEMY_DATABASE_URI", "sqlite:////tmp/app.db")
-    app.config.setdefault("SQLALCHEMY_TRACK_MODIFICATIONS", False)
-
     db.init_app(app)
     login_manager.init_app(app)
 
@@ -44,22 +40,14 @@ def create_app():
     app.register_blueprint(admin_bp, url_prefix="/admin")
 
     with app.app_context():
-        # Import models to register tables
-        from . import models  # noqa: F401
+        from . import models  # noqa
+        db.create_all()
 
-        db_uri = app.config.get("SQLALCHEMY_DATABASE_URI", "")
+        from .schema import ensure_schema
+        ensure_schema()
 
-        # Only auto-create tables / run ensure_schema for SQLite
-        # (Avoid unexpected behavior when using Postgres in production)
-        if db_uri.startswith("sqlite"):
-            _ensure_sqlite_parent_dir(db_uri)
-            db.create_all()
-
-            # Optional: schema adjustments for older sqlite dbs
-            try:
-                from .schema import ensure_schema
-                ensure_schema()
-            except Exception as e:
-                app.logger.warning(f"ensure_schema() failed: {e}")
+        # ✅ SEED AUTOMÁTICO
+        from .seed import seed_defaults
+        seed_defaults()
 
     return app
