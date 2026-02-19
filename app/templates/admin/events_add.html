@@ -22,12 +22,7 @@
 
           <div class="col-12 col-md-4">
             <label class="form-label">Type</label>
-            {{ form.media_type(class_="form-select") }}
-          </div>
-
-          <div class="col-12 col-md-4">
-            <label class="form-label">Date</label>
-            {{ form.date(class_="form-control", placeholder="DD/MM/AAAA") }}
+            {{ form.kind(class_="form-select") }}
           </div>
 
           <div class="col-12 col-md-4">
@@ -38,7 +33,7 @@
           <div class="col-12">
             <label class="form-label">File</label>
             {{ form.file(class_="form-control") }}
-            <div class="form-text">Se for vídeo, use MP4/WebM quando possível.</div>
+            <div class="form-text">Para vídeo, prefira MP4/WebM.</div>
           </div>
 
           <div class="col-12 d-flex gap-2">
