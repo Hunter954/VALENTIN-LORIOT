@@ -31,7 +31,7 @@
 
     <div class="instagram-grid">
       {% for p in photos %}
-        <img class="ig-photo" src="{{ p.file_path }}" alt="Photo {{ loop.index }}" />
+        <a href="#" class="media-popup-link" data-popup="1" data-type="image" data-src="{{ p.file_path }}"><img class="ig-photo" src="{{ p.file_path }}" alt="Photo {{ loop.index }}" /></a>
       {% endfor %}
       {% if photos|length == 0 %}
         <div class="ig-empty">Add photos in /admin → Portfolio Photos.</div>
@@ -43,4 +43,106 @@
     </div>
   </div>
 </section>
+<!-- MEDIA POPUP (foto/vídeo) -->
+<div id="mediaModal" class="media-modal" aria-hidden="true">
+  <div class="media-modal__backdrop" data-close="1"></div>
+
+  <div class="media-modal__content" role="dialog" aria-modal="true">
+    <button class="media-modal__close" type="button" data-close="1" aria-label="Close">×</button>
+
+    <img id="mediaModalImg" class="media-modal__img" alt="" style="display:none;">
+    <video id="mediaModalVideo" class="media-modal__video" controls playsinline style="display:none;"></video>
+  </div>
+</div>
+
+<style>
+  .media-modal { position: fixed; inset: 0; display: none; z-index: 9999; }
+  .media-modal.is-open { display: block; }
+  .media-modal__backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.75); }
+  .media-modal__content {
+    position: relative;
+    width: min(1000px, calc(100% - 24px));
+    margin: 60px auto;
+    background: #0b0b0b;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: 0 20px 70px rgba(0,0,0,.6);
+  }
+  .media-modal__close {
+    position: absolute; top: 8px; right: 10px;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.06);
+    color: #fff; font-size: 22px; cursor: pointer;
+  }
+  .media-modal__img { width: 100%; height: auto; border-radius: 10px; }
+  .media-modal__video { width: 100%; max-height: 70vh; border-radius: 10px; }
+  .works-item a.media-popup-link { display:block; color: inherit; text-decoration:none; }
+</style>
+
+<script>
+  (function () {
+    const modal = document.getElementById("mediaModal");
+    const img = document.getElementById("mediaModalImg");
+    const video = document.getElementById("mediaModalVideo");
+
+    function openModal({ type, src, poster }) {
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      document.documentElement.style.overflow = "hidden";
+
+      img.style.display = "none";
+      img.removeAttribute("src");
+      video.style.display = "none";
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+
+      if (type === "image") {
+        img.src = src;
+        img.style.display = "block";
+      } else {
+        if (poster) video.setAttribute("poster", poster);
+        video.src = src;
+        video.style.display = "block";
+        setTimeout(() => video.play().catch(() => {}), 50);
+      }
+    }
+
+    function closeModal() {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.documentElement.style.overflow = "";
+
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+      img.removeAttribute("src");
+    }
+
+    modal.addEventListener("click", (e) => {
+      if (e.target && e.target.dataset && e.target.dataset.close) closeModal();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
+    });
+
+    document.addEventListener("click", (e) => {
+      const el = e.target.closest("[data-popup]");
+      if (!el) return;
+
+      e.preventDefault();
+
+      const type = el.getAttribute("data-type") || "image";
+      const src = el.getAttribute("data-src");
+      const poster = el.getAttribute("data-poster") || "";
+
+      if (!src) return;
+      openModal({ type, src, poster });
+    });
+  })();
+</script>
 {% endblock %}
