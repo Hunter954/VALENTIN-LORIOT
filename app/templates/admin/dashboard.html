@@ -165,5 +165,114 @@
       </div>
     </div>
   </div>
+
+  {# EVENTS MEDIA (photo/video) #}
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Events (Fotos/Vídeos)</h5>
+          <a class="btn btn-sm btn-warning" href="{{ url_for('admin.events_add') }}">Gerenciar</a>
+        </div>
+        <hr>
+        {% if events_media is defined and events_media %}
+          <div class="list-group">
+            {% for item in events_media %}
+              <div class="list-group-item d-flex justify-content-between align-items-center" style="background:#0f0f0f; border-color: rgba(255,255,255,.08); color:#fff;">
+                <div class="me-3" style="min-width:0;">
+                  <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <div><strong>#{{ item.position }}</strong> — {{ item.title }}</div>
+                    {% if item.kind is defined %}
+                      <span class="badge text-bg-secondary">{{ item.kind }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="text-muted small text-truncate" style="max-width: 100%;">{{ item.file_path }}</div>
+                </div>
+                {% if item.id is defined %}
+                <form method="post" action="{{ url_for('admin.events_delete', item_id=item.id) }}">
+                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove?')">Excluir</button>
+                </form>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">Nenhuma mídia cadastrada ainda.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {# PORTFOLIO PHOTOS #}
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Portfolio Photos</h5>
+          <a class="btn btn-sm btn-warning" href="{{ url_for('admin.portfolio_photos_add') }}">Gerenciar</a>
+        </div>
+        <hr>
+        {% if portfolio_photos is defined and portfolio_photos %}
+          <div class="list-group">
+            {% for p in portfolio_photos %}
+              <div class="list-group-item d-flex justify-content-between align-items-center" style="background:#0f0f0f; border-color: rgba(255,255,255,.08); color:#fff;">
+                <div class="me-3" style="min-width:0;">
+                  <div><strong>#{{ p.position }}</strong> — {{ p.title }}</div>
+                  <div class="text-muted small text-truncate" style="max-width: 100%;">{{ p.file_path }}</div>
+                </div>
+                {% if p.id is defined %}
+                <form method="post" action="{{ url_for('admin.portfolio_photos_delete', item_id=p.id) }}">
+                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove?')">Excluir</button>
+                </form>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">Nenhuma foto ainda.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {# CLIENTS MEDIA (photo/video per client) #}
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Clients Media (Fotos/Vídeos)</h5>
+          <a class="btn btn-sm btn-warning" href="{{ url_for('admin.clients_media_add') }}">Gerenciar</a>
+        </div>
+        <hr>
+        {% if clients_media is defined and clients_media %}
+          <div class="list-group">
+            {% for m in clients_media %}
+              <div class="list-group-item d-flex justify-content-between align-items-center" style="background:#0f0f0f; border-color: rgba(255,255,255,.08); color:#fff;">
+                <div class="me-3" style="min-width:0;">
+                  <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <div><strong>#{{ m.position }}</strong> — {{ m.title }}</div>
+                    {% if m.kind is defined %}
+                      <span class="badge text-bg-secondary">{{ m.kind }}</span>
+                    {% endif %}
+                    {% if m.client is defined and m.client %}
+                      <span class="badge text-bg-dark">{{ m.client.name if m.client.name is defined else m.client }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="text-muted small text-truncate" style="max-width: 100%;">{{ m.file_path }}</div>
+                </div>
+                {% if m.id is defined %}
+                <form method="post" action="{{ url_for('admin.clients_media_delete', item_id=m.id) }}">
+                  <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove?')">Excluir</button>
+                </form>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">Nenhum upload ainda.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

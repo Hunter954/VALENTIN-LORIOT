@@ -44,5 +44,56 @@
       </form>
     </div>
   </div>
+
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Mídias já enviadas</h5>
+        <div class="text-muted small">(gerencie aqui sem precisar voltar ao dashboard)</div>
+      </div>
+      <hr>
+
+      {% if events_media is defined and events_media %}
+        <div class="list-group">
+          {% for item in events_media %}
+            {% set src = item.file_path %}
+            {% if src and (not src.startswith('http')) and (not src.startswith('/')) %}
+              {% set src = url_for('static', filename=src) %}
+            {% endif %}
+
+            <div class="list-group-item d-flex justify-content-between align-items-start gap-3">
+              <div class="d-flex gap-3" style="min-width:0;">
+                <div style="width: 180px;">
+                  {% if item.kind is defined and item.kind in ['video','Video','VIDEO'] %}
+                    <video src="{{ src }}" style="width:100%; border-radius:10px;" controls preload="metadata"></video>
+                  {% else %}
+                    <img src="{{ src }}" alt="" style="width:100%; border-radius:10px; object-fit:cover;" />
+                  {% endif %}
+                </div>
+                <div style="min-width:0;">
+                  <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <div><strong>#{{ item.position }}</strong> — {{ item.title }}</div>
+                    {% if item.kind is defined %}
+                      <span class="badge text-bg-secondary">{{ item.kind }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="text-muted small text-truncate" style="max-width: 520px;">{{ item.file_path }}</div>
+                  <a class="btn btn-sm btn-ghost mt-2" href="{{ src }}" target="_blank">Abrir arquivo</a>
+                </div>
+              </div>
+
+              {% if item.id is defined %}
+              <form method="post" action="{{ url_for('admin.events_delete', item_id=item.id) }}">
+                <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remover este item?')">Excluir</button>
+              </form>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted mb-0">Nenhum item cadastrado ainda.</p>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}
