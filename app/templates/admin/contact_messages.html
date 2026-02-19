@@ -1,43 +1,42 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin - Contact Messages</title>
-  <style>
-    body{font-family:system-ui,Arial;max-width:1100px;margin:40px auto;padding:0 18px;}
-    a{color:#111;}
-    table{width:100%;border-collapse:collapse;}
-    th,td{border-bottom:1px solid #eee;padding:10px;text-align:left;vertical-align:top;}
-    th{background:#fafafa;}
-    .msg{white-space:pre-wrap;}
-  </style>
-</head>
-<body>
-  <p><a href="{{ url_for('admin.dashboard') }}">← Back to dashboard</a></p>
-  <h2>Contact messages</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Message</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for m in messages %}
-        <tr>
-          <td>{{ m.created_at }}</td>
-          <td>{{ m.name }}</td>
-          <td>{{ m.email }}</td>
-          <td class="msg">{{ m.message }}</td>
-        </tr>
-      {% endfor %}
-      {% if messages|length == 0 %}
-        <tr><td colspan="4">No messages yet.</td></tr>
-      {% endif %}
-    </tbody>
-  </table>
-</body>
-</html>
+{% extends "admin/base.html" %}
+
+{% block body %}
+<div class="container-fluid">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h2 class="mb-0">Contact Messages</h2>
+      <div class="text-muted small">Mensagens recebidas pelo formulário /contact</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th style="min-width:170px;">Date</th>
+              <th style="min-width:160px;">Name</th>
+              <th style="min-width:220px;">Email</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in messages %}
+              <tr>
+                <td class="text-muted small">{{ m.created_at }}</td>
+                <td>{{ m.name }}</td>
+                <td><a href="mailto:{{ m.email }}">{{ m.email }}</a></td>
+                <td style="white-space: pre-wrap;">{{ m.message }}</td>
+              </tr>
+            {% endfor %}
+            {% if messages|length == 0 %}
+              <tr><td colspan="4" class="text-muted p-4">No messages yet.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
