@@ -75,6 +75,62 @@ class ClientLogo(db.Model):
     file_path = db.Column(db.String(255), nullable=False)
     position = db.Column(db.Integer, default=1)
 
+    # Used for /clients/<slug>
+    slug = db.Column(db.String(140), default="")
+
+
+class PortfolioPhoto(db.Model):
+    __tablename__ = "portfolio_photos"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(120), default="")
+    file_path = db.Column(db.String(255), nullable=False)
+    position = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class EventMedia(db.Model):
+    __tablename__ = "event_media"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(120), default="")
+    kind = db.Column(db.String(10), default="image")  # image | video
+    file_path = db.Column(db.String(255), nullable=False)
+    position = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class ClientPhoto(db.Model):
+    __tablename__ = "client_photos"
+
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey("client_logos.id"), nullable=False)
+    title = db.Column(db.String(120), default="")
+    file_path = db.Column(db.String(255), nullable=False)
+    position = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class ClientVideo(db.Model):
+    __tablename__ = "client_videos"
+
+    id = db.Column(db.Integer, primary_key=True)
+    client_id = db.Column(db.Integer, db.ForeignKey("client_logos.id"), nullable=False)
+    title = db.Column(db.String(120), default="")
+    file_path = db.Column(db.String(255), nullable=False)
+    position = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class ContactMessage(db.Model):
+    __tablename__ = "contact_messages"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), default="")
+    email = db.Column(db.String(180), default="")
+    message = db.Column(db.Text, default="")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class GalleryVideo(db.Model):
     """Vídeos de trabalhos / reels (mantidos para não perder uploads existentes)."""

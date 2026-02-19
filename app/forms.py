@@ -6,8 +6,9 @@ from wtforms import (
     IntegerField,
     SubmitField,
     FileField,
+    SelectField,
 )
-from wtforms.validators import DataRequired, Length, Optional, NumberRange, URL
+from wtforms.validators import DataRequired, Length, Optional, NumberRange, Email
 
 
 class LoginForm(FlaskForm):
@@ -49,6 +50,7 @@ class UploadHeroVideoForm(FlaskForm):
 
 class UploadClientLogoForm(FlaskForm):
     name = StringField("Nome", validators=[DataRequired(), Length(max=120)])
+    slug = StringField("Slug (URL)", validators=[Optional(), Length(max=140)])
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
     image = FileField("Logo (png/svg/jpg/webp)", validators=[DataRequired()])
     submit = SubmitField("Enviar")
@@ -83,3 +85,44 @@ class SocialLinkForm(FlaskForm):
     )
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
     submit = SubmitField("Save")
+
+
+class UploadPortfolioPhotoForm(FlaskForm):
+    title = StringField("Título", validators=[Optional(), Length(max=120)])
+    position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
+    image = FileField("Photo (png/jpg/webp)", validators=[DataRequired()])
+    submit = SubmitField("Enviar")
+
+
+class UploadEventMediaForm(FlaskForm):
+    title = StringField("Título", validators=[Optional(), Length(max=120)])
+    kind = SelectField(
+        "Tipo",
+        choices=[("image", "Imagem"), ("video", "Vídeo")],
+        validators=[DataRequired()],
+        default="image",
+    )
+    position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
+    file = FileField("Arquivo (imagem ou vídeo)", validators=[DataRequired()])
+    submit = SubmitField("Enviar")
+
+
+class UploadClientMediaForm(FlaskForm):
+    client_id = SelectField("Cliente", coerce=int, validators=[DataRequired()])
+    title = StringField("Título", validators=[Optional(), Length(max=120)])
+    kind = SelectField(
+        "Tipo",
+        choices=[("image", "Imagem"), ("video", "Vídeo")],
+        validators=[DataRequired()],
+        default="image",
+    )
+    position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
+    file = FileField("Arquivo", validators=[DataRequired()])
+    submit = SubmitField("Enviar")
+
+
+class ContactForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired(), Length(max=120)])
+    email = StringField("Email", validators=[DataRequired(), Email(), Length(max=180)])
+    message = TextAreaField("Message", validators=[DataRequired(), Length(min=3)])
+    submit = SubmitField("Send")

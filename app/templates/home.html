@@ -10,10 +10,12 @@
     {% endif %}
   </div>
   <nav class="menu">
-    <a href="#home">Home</a>
-    <a href="#works">Videos</a>
-    <a href="#about">About Us</a>
-    <a href="#contact">Contact</a>
+    <a href="{{ url_for('main.home') }}#home">Home</a>
+    <a href="{{ url_for('main.portfolio') }}">Portfolio</a>
+    <a href="{{ url_for('main.events') }}">Events</a>
+    <a href="{{ url_for('main.clients') }}">Clients</a>
+    <a href="{{ url_for('main.about') }}">About Us</a>
+    <a href="{{ url_for('main.contact') }}">Contact</a>
   </nav>
   <div class="social">
     {% if socials and socials|length > 0 %}
@@ -123,9 +125,9 @@
 
 <section id="works" class="section works">
   <div class="section-inner">
-    <h2 class="section-title">VIDEOS</h2>
+    <h2 class="section-title">PORTFOLIO</h2>
     <div class="works-grid">
-      {% for g in works_videos %}
+      {% for g in works_videos[:6] %}
         <div class="works-item">
           <video class="works-video" playsinline muted preload="metadata" loop>
             <source src="{{ g.file_path }}" type="video/mp4">
@@ -138,6 +140,10 @@
       {% if works_videos|length == 0 %}
         <div class="works-empty">Add videos in /admin → Works (Videos).</div>
       {% endif %}
+    </div>
+
+    <div style="display:flex;justify-content:center;margin-top:30px;">
+      <a class="btn" href="{{ url_for('main.portfolio') }}">SEE MORE</a>
     </div>
   </div>
 </section>
@@ -159,7 +165,7 @@
   </div>
 </section>
 
-<footer id="contact" class="footer">
+<footer class="footer">
   <div class="footer-inner">
     <div class="footer-brand">
       <div class="brand">

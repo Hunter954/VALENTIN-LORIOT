@@ -11,6 +11,11 @@ from .models import (
     Showreel,
     InstagramPhoto,
     SocialLink,
+    PortfolioPhoto,
+    EventMedia,
+    ClientPhoto,
+    ClientVideo,
+    ContactMessage,
 )
 from .forms import (
     LoginForm,
@@ -22,8 +27,11 @@ from .forms import (
     UploadShowreelForm,
     UploadInstagramPhotoForm,
     SocialLinkForm,
+    UploadPortfolioPhotoForm,
+    UploadEventMediaForm,
+    UploadClientMediaForm,
 )
-from .utils import save_upload
+from .utils import save_upload, slugify
 
 bp = Blueprint("admin", __name__, template_folder="templates")
 
@@ -39,6 +47,10 @@ def dashboard():
     ig_photos = InstagramPhoto.query.order_by(InstagramPhoto.position.asc()).all()
     socials = SocialLink.query.order_by(SocialLink.position.asc()).all()
 
+    portfolio_photos = PortfolioPhoto.query.order_by(PortfolioPhoto.position.asc()).all()
+    events_media = EventMedia.query.order_by(EventMedia.position.asc()).all()
+    contact_messages = ContactMessage.query.order_by(ContactMessage.created_at.desc()).limit(10).all()
+
     return render_template(
         "admin/dashboard.html",
         settings=settings,
@@ -48,6 +60,9 @@ def dashboard():
         showreel=showreel,
         ig_photos=ig_photos,
         socials=socials,
+        portfolio_photos=portfolio_photos,
+        events_media=events_media,
+        contact_messages=contact_messages,
     )
 
 
@@ -169,7 +184,9 @@ def clients_add():
             flash(str(e), "danger")
             return render_template("admin/clients_add.html", form=form)
 
-        item = ClientLogo(name=form.name.data, position=form.position.data, file_path=web_path)
+        slug = form.slug.data.strip() if getattr(form, "slug", None) and form.slug.data else ""
+        slug = slugify(slug) if slug else slugify(form.name.data)
+        item = ClientLogo(name=form.name.data, slug=slug, position=form.position.data, file_path=web_path)
         db.session.add(item)
         db.session.commit()
         flash("Logo adicionada!", "success")
@@ -257,6 +274,125 @@ def instagram_add():
         return redirect(url_for("admin.dashboard"))
 
     return render_template("admin/instagram_add.html", form=form)
+
+
+@bp.route("/portfolio/photos/add", methods=["GET", "POST"])
+@login_required
+def portfolio_photos_add():
+    form = UploadPortfolioPhotoForm()
+    if form.validate_on_submit():
+        try:
+            web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
+        except Exception as e:
+            flash(str(e), "danger")
+            return render_template("admin/portfolio_photo_add.html", form=form)
+
+        item = PortfolioPhoto(title=form.title.data or "", position=form.position.data, file_path=web_path)
+        db.session.add(item)
+        db.session.commit()
+        flash("Photo adicionada!", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/portfolio_photo_add.html", form=form)
+
+
+@bp.post("/portfolio/photos/<int:item_id>/delete")
+@login_required
+def portfolio_photos_delete(item_id):
+    item = PortfolioPhoto.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    flash("Photo removida.", "info")
+    return redirect(url_for("admin.dashboard"))
+
+
+@bp.route("/events/add", methods=["GET", "POST"])
+@login_required
+def events_add():
+    form = UploadEventMediaForm()
+    if form.validate_on_submit():
+        kind = form.kind.data
+        try:
+            web_path = save_upload(form.file.data, current_app.config["UPLOAD_FOLDER"], "video" if kind == "video" else "image")
+        except Exception as e:
+            flash(str(e), "danger")
+            return render_template("admin/events_add.html", form=form)
+
+        item = EventMedia(title=form.title.data or "", kind=kind, position=form.position.data, file_path=web_path)
+        db.session.add(item)
+        db.session.commit()
+        flash("Item adicionado em Events!", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/events_add.html", form=form)
+
+
+@bp.post("/events/<int:item_id>/delete")
+@login_required
+def events_delete(item_id):
+    item = EventMedia.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    flash("Item removido.", "info")
+    return redirect(url_for("admin.dashboard"))
+
+
+@bp.route("/clients/media/add", methods=["GET", "POST"])
+@login_required
+def clients_media_add():
+    form = UploadClientMediaForm()
+    # populate choices
+    clients_list = ClientLogo.query.order_by(ClientLogo.position.asc()).all()
+    form.client_id.choices = [(c.id, f"{c.name} ({c.slug or c.id})") for c in clients_list]
+
+    if form.validate_on_submit():
+        kind = form.kind.data
+        try:
+            web_path = save_upload(form.file.data, current_app.config["UPLOAD_FOLDER"], "video" if kind == "video" else "image")
+        except Exception as e:
+            flash(str(e), "danger")
+            return render_template("admin/clients_media_add.html", form=form)
+
+        if kind == "video":
+            item = ClientVideo(
+                client_id=form.client_id.data,
+                title=form.title.data or "",
+                position=form.position.data,
+                file_path=web_path,
+            )
+        else:
+            item = ClientPhoto(
+                client_id=form.client_id.data,
+                title=form.title.data or "",
+                position=form.position.data,
+                file_path=web_path,
+            )
+        db.session.add(item)
+        db.session.commit()
+        flash("Mídia do cliente adicionada!", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/clients_media_add.html", form=form)
+
+
+@bp.post("/clients/media/<string:kind>/<int:item_id>/delete")
+@login_required
+def clients_media_delete(kind: str, item_id: int):
+    if kind == "video":
+        item = ClientVideo.query.get_or_404(item_id)
+    else:
+        item = ClientPhoto.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    flash("Mídia removida.", "info")
+    return redirect(url_for("admin.dashboard"))
+
+
+@bp.get("/contact/messages")
+@login_required
+def contact_messages():
+    msgs = ContactMessage.query.order_by(ContactMessage.created_at.desc()).all()
+    return render_template("admin/contact_messages.html", messages=msgs)
 
 
 @bp.post("/instagram/<int:item_id>/delete")

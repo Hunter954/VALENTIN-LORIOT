@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block body %}
+<header class="top-nav">
+  <div class="top-nav-inner">
+    <div class="brand">
+      {% if settings and settings.brand_logo_path %}
+        <img class="brand-logo" src="{{ settings.brand_logo_path }}" alt="{{ settings.site_title }}" />
+      {% else %}
+        <div class="brand-mark">VL</div>
+      {% endif %}
+    </div>
+    <nav class="menu">
+      <a href="{{ url_for('main.home') }}">Home</a>
+      <a href="{{ url_for('main.portfolio') }}">Portfolio</a>
+      <a href="{{ url_for('main.events') }}">Events</a>
+      <a href="{{ url_for('main.clients') }}" class="active">Clients</a>
+      <a href="{{ url_for('main.about') }}">About Us</a>
+      <a href="{{ url_for('main.contact') }}">Contact</a>
+    </nav>
+    <div class="social">
+      {% for s in socials %}
+        <a href="{{ s.url }}" aria-label="{{ s.name }}" title="{{ s.name }}"><i class="{{ s.icon_class }}"></i></a>
+      {% endfor %}
+    </div>
+  </div>
+</header>
+
+<section class="section works" style="padding-top:140px;">
+  <div class="section-inner">
+    <h1 class="section-title" style="text-align:center;margin-bottom:40px;">{{ client.name }}</h1>
+
+    {% if videos|length > 0 %}
+      <h2 class="section-title">VIDEOS</h2>
+      <div class="works-grid">
+        {% for v in videos %}
+          <div class="works-item">
+            <video class="works-video" playsinline muted preload="metadata" loop controls>
+              <source src="{{ v.file_path }}" type="video/mp4">
+            </video>
+            {% if v.title %}
+              <div class="works-item-overlay">{{ v.title }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if photos|length > 0 %}
+      <h2 class="section-title" style="margin-top:70px;">PHOTOGRAPHED</h2>
+      <div class="instagram-grid" style="margin-top:20px;">
+        {% for p in photos %}
+          <img class="ig-photo" src="{{ p.file_path }}" alt="Photo {{ loop.index }}" />
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if videos|length == 0 and photos|length == 0 %}
+      <div class="works-empty">Add media for this client in /admin → Clients Media.</div>
+    {% endif %}
+
+    <div style="display:flex;justify-content:center;margin-top:40px;">
+      <a class="btn" href="{{ url_for('main.clients') }}">BACK</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

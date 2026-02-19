@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block body %}
+<header class="top-nav">
+  <div class="top-nav-inner">
+    <div class="brand">
+      {% if settings and settings.brand_logo_path %}
+        <img class="brand-logo" src="{{ settings.brand_logo_path }}" alt="{{ settings.site_title }}" />
+      {% else %}
+        <div class="brand-mark">VL</div>
+      {% endif %}
+    </div>
+    <nav class="menu">
+      <a href="{{ url_for('main.home') }}">Home</a>
+      <a href="{{ url_for('main.portfolio') }}">Portfolio</a>
+      <a href="{{ url_for('main.events') }}">Events</a>
+      <a href="{{ url_for('main.clients') }}">Clients</a>
+      <a href="{{ url_for('main.about') }}">About Us</a>
+      <a href="{{ url_for('main.contact') }}" class="active">Contact</a>
+    </nav>
+    <div class="social">
+      {% for s in socials %}
+        <a href="{{ s.url }}" aria-label="{{ s.name }}" title="{{ s.name }}"><i class="{{ s.icon_class }}"></i></a>
+      {% endfor %}
+    </div>
+  </div>
+</header>
+
+<section style="padding:140px 0 80px;">
+  <div style="max-width:900px;margin:0 auto;padding:0 24px;">
+    <h1 class="section-title" style="text-align:center;margin-bottom:30px;">CONTACT</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="margin:20px 0;">
+          {% for category, message in messages %}
+            <div style="padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,.12);border-radius:10px;">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" style="display:grid;gap:14px;">
+      {{ form.hidden_tag() }}
+
+      <div>
+        <label style="display:block;margin-bottom:6px;">Name</label>
+        {{ form.name(class_='input', placeholder='Your name', style='width:100%;padding:12px;border-radius:10px;') }}
+        {% for e in form.name.errors %}<div style="color:#ffb3b3;font-size:13px;">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div>
+        <label style="display:block;margin-bottom:6px;">Email</label>
+        {{ form.email(class_='input', placeholder='you@email.com', style='width:100%;padding:12px;border-radius:10px;') }}
+        {% for e in form.email.errors %}<div style="color:#ffb3b3;font-size:13px;">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div>
+        <label style="display:block;margin-bottom:6px;">Message</label>
+        {{ form.message(class_='input', placeholder='Write your message...', rows='7', style='width:100%;padding:12px;border-radius:10px;') }}
+        {% for e in form.message.errors %}<div style="color:#ffb3b3;font-size:13px;">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div style="display:flex;justify-content:center;margin-top:8px;">
+        <button class="btn" type="submit">SEND</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

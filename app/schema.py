@@ -54,6 +54,9 @@ def ensure_schema() -> None:
             ("overlay_top", "VARCHAR(120) DEFAULT ''"),
             ("overlay_title", "VARCHAR(120) DEFAULT ''"),
         ],
+        "client_logos": [
+            ("slug", "VARCHAR(140) DEFAULT ''"),
+        ],
     }
 
     for table, cols in alterations.items():
