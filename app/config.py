@@ -1,15 +1,28 @@
 import os
 
+
+def _truthy(val: str | None) -> bool:
+    return str(val or "").lower() in ("1", "true", "yes", "y", "on")
+
+
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev")
 
-    database_url = os.getenv("DATABASE_URL") or os.getenv("DATABASE_PUBLIC_URL")
+    # Railway normalmente injeta DATABASE_URL (Postgres plugin).
+    # Alguns ambientes usam DATABASE_PUBLIC_URL / POSTGRES_URL.
+    database_url = (
+        os.getenv("DATABASE_URL")
+        or os.getenv("DATABASE_PUBLIC_URL")
+        or os.getenv("POSTGRES_URL")
+        or os.getenv("POSTGRESQL_URL")
+    )
 
+    # SQLAlchemy/psycopg usa 'postgresql://'
     if database_url and database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
 
-    SQLALCHEMY_DATABASE_URI = database_url or "sqlite:////tmp/app.db"
+    SQLALCHEMY_DATABASE_URI = database_url or os.getenv("SQLALCHEMY_DATABASE_URI") or "sqlite:///instance/app.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "app/static/uploads")
-    MAX_CONTENT_LENGTH = 1024 * 1024 * 500
+    MAX_CONTENT_LENGTH = 1024 * 1024 * 500  # 500MB
