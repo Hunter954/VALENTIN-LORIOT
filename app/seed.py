@@ -7,7 +7,6 @@ def seed_defaults():
     # ⚠️ DICA: coloque isso como variável no Railway depois
     admin_user = os.getenv("ADMIN_USER", "admin")
     admin_pass = os.getenv("ADMIN_PASS", "kw9kmc58")
-    admin_reset = os.getenv("ADMIN_RESET", "0") == "1"
 
     # Settings padrão (se não existir)
     if not SiteSetting.query.first():
@@ -31,9 +30,6 @@ def seed_defaults():
         user = AdminUser(username=admin_user)
         user.set_password(admin_pass)
         db.session.add(user)
-    elif admin_reset:
-        # Permite recuperar acesso ao admin sem apagar registros no banco
-        user.set_password(admin_pass)
 
     db.session.commit()
     print("OK: seed executado (settings + admin garantidos).")
