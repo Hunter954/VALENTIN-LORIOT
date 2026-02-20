@@ -1,70 +1,62 @@
-"""Pequeno "auto-migrate" para SQLite.
+"""app/schema.py
 
-Objetivo: permitir atualizar o código sem perder uploads já existentes.
-- db.create_all() cria tabelas novas.
-- Para colunas novas em tabelas existentes, fazemos ALTER TABLE ADD COLUMN.
+A função ensure_schema existia para compatibilidade com SQLite (usando sqlite_master),
+mas isso quebra em Postgres.
 
-Isso é intencionalmente simples (sem Alembic) e cobre o que este projeto usa.
+Esta implementação usa o inspector do SQLAlchemy (compatível com Postgres/SQLite) e é segura.
+Se você precisar aplicar ALTER TABLE/novas colunas, coloque as regras em `SCHEMA_UPDATES`.
 """
 
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
-
-from sqlalchemy import text
-
+from sqlalchemy import text, inspect
 from . import db
 
 
-def _get_columns(table_name: str) -> List[str]:
-    rows = db.session.execute(text(f"PRAGMA table_info({table_name});")).fetchall()
-    return [r[1] for r in rows]  # name
+# Exemplo de estrutura para evoluções manuais de schema (opcional):
+# SCHEMA_UPDATES = [
+#   {
+#     "table": "site_setting",
+#     "columns": [
+#       ("new_col", "TEXT", "DEFAULT ''"),
+#     ]
+#   }
+# ]
+SCHEMA_UPDATES: list[dict] = []
 
 
-def _table_exists(table_name: str) -> bool:
-    row = db.session.execute(
-        text("SELECT name FROM sqlite_master WHERE type='table' AND name=:n"),
-        {"n": table_name},
-    ).fetchone()
-    return row is not None
+def _has_table(table_name: str) -> bool:
+    inspector = inspect(db.engine)
+    return inspector.has_table(table_name)
 
 
-def _add_column(table: str, col_name: str, col_sql: str) -> None:
-    db.session.execute(text(f"ALTER TABLE {table} ADD COLUMN {col_name} {col_sql};"))
+def _has_column(table_name: str, column_name: str) -> bool:
+    inspector = inspect(db.engine)
+    cols = inspector.get_columns(table_name)
+    return any(c.get("name") == column_name for c in cols)
 
 
 def ensure_schema() -> None:
-    """Garante que o schema tenha as colunas/tabelas novas."""
+    """Aplica pequenas evoluções de schema de forma idempotente.
 
-    # Tabelas novas (create_all já cria, mas deixamos aqui como documentação)
-    # - showreel
-    # - instagram_photos
-    # - social_links
+    Se você usa Alembic/Flask-Migrate, pode deixar SCHEMA_UPDATES vazio.
+    """
+    if not SCHEMA_UPDATES:
+        return
 
-    # Colunas novas em tabelas existentes
-    alterations: Dict[str, List[Tuple[str, str]]] = {
-        "site_settings": [
-            ("brand_logo_path", "VARCHAR(255) DEFAULT ''"),
-            ("footer_about", "TEXT DEFAULT ''"),
-            ("footer_phone", "VARCHAR(120) DEFAULT ''"),
-            ("footer_email", "VARCHAR(120) DEFAULT ''"),
-            ("footer_copyright", "VARCHAR(180) DEFAULT ''"),
-        ],
-        "hero_videos": [
-            ("overlay_top", "VARCHAR(120) DEFAULT ''"),
-            ("overlay_title", "VARCHAR(120) DEFAULT ''"),
-        ],
-        "client_logos": [
-            ("slug", "VARCHAR(140) DEFAULT ''"),
-        ],
-    }
-
-    for table, cols in alterations.items():
-        if not _table_exists(table):
+    for upd in SCHEMA_UPDATES:
+        table = upd.get("table")
+        columns = upd.get("columns", [])
+        if not table or not columns:
             continue
-        existing = set(_get_columns(table))
-        for col_name, col_sql in cols:
-            if col_name not in existing:
-                _add_column(table, col_name, col_sql)
 
+        if not _has_table(table):
+            continue
+
+        for col_name, col_type, *rest in columns:
+            if _has_column(table, col_name):
+                continue
+            extra = rest[0] if rest else ""
+            stmt = f'ALTER TABLE "{table}" ADD COLUMN "{col_name}" {col_type} {extra}'.strip()
+            db.session.execute(text(stmt))
     db.session.commit()
