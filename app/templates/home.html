@@ -44,9 +44,20 @@
     {% else %}
       {% for v in hero_videos %}
       <div class="hero-slide" data-index="{{ loop.index0 }}">
-        <video class="hero-video" playsinline muted preload="metadata" loop>
-          <source src="{{ v.file_path }}" type="video/mp4">
-        </video>
+        {% if v.file_path|is_vimeo %}
+          <iframe
+            class="hero-video"
+            src="{{ v.file_path|vimeo_embed }}"
+            frameborder="0"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowfullscreen
+            title="{{ v.title }}"
+          ></iframe>
+        {% else %}
+          <video class="hero-video" playsinline muted preload="metadata" loop>
+            <source src="{{ v.file_path }}" type="video/mp4">
+          </video>
+        {% endif %}
         <div class="hero-overlay">
           <div class="hero-overlay-inner">
             {% if v.overlay_top %}
@@ -83,9 +94,20 @@
 <section id="showreel" class="section showreel">
   <div class="showreel-inner">
     {% if showreel %}
-      <video class="showreel-video" playsinline muted preload="metadata" loop>
-        <source src="{{ showreel.file_path }}" type="video/mp4">
-      </video>
+      {% if showreel.file_path|is_vimeo %}
+        <iframe
+          class="showreel-video"
+          src="{{ showreel.file_path|vimeo_embed }}"
+          frameborder="0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
+          title="{{ showreel.title }}"
+        ></iframe>
+      {% else %}
+        <video class="showreel-video" playsinline muted preload="metadata" loop>
+          <source src="{{ showreel.file_path }}" type="video/mp4">
+        </video>
+      {% endif %}
       <div class="showreel-overlay">
         <h3 class="showreel-title">{{ showreel.title }}</h3>
         <p class="showreel-sub">Showreel vibes</p>
@@ -129,9 +151,20 @@
     <div class="works-grid">
       {% for g in works_videos[:6] %}
         <div class="works-item">
-          <video class="works-video" playsinline muted preload="metadata" loop>
-            <source src="{{ g.file_path }}" type="video/mp4">
-          </video>
+          {% if g.file_path|is_vimeo %}
+            <iframe
+              class="works-video"
+              src="{{ g.file_path|vimeo_embed }}"
+              frameborder="0"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowfullscreen
+              title="{{ g.title }}"
+            ></iframe>
+          {% else %}
+            <video class="works-video" playsinline muted preload="metadata" loop>
+              <source src="{{ g.file_path }}" type="video/mp4">
+            </video>
+          {% endif %}
           {% if g.title %}
             <div class="works-item-overlay">{{ g.title }}</div>
           {% endif %}
