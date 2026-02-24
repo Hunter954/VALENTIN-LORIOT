@@ -179,7 +179,7 @@ def clients_add():
     form = UploadClientLogoForm()
     if form.validate_on_submit():
         # Aceita upload OU URL
-        web_path = (form.image_url.data or "").strip() if hasattr(form, "image_url") else ""
+        web_path = (form.url.data or "").strip() if hasattr(form, "url") else ""
         if not web_path:
             if not form.image.data:
                 flash("Envie um arquivo ou informe uma URL.", "danger")
@@ -190,21 +190,6 @@ def clients_add():
                 flash(str(e), "danger")
                 return render_template("admin/clients_add.html", form=form)
 
-        slug = form.slug.data.strip() if getattr(form, "slug", None) and form.slug.data else ""
-        slug = slugify(slug) if slug else slugify(form.name.data)
-        item = ClientLogo(name=form.name.data, slug=slug, position=form.position.data, file_path=web_path)
-        db.session.add(item)
-        db.session.commit()
-        flash("Logo adicionada!", "success")
-        return redirect(url_for("admin.dashboard"))
-
-    return render_template("admin/clients_add.html", form=form)
-
-    try:
-        web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
-    except Exception as e:
-        flash(str(e), "danger")
-        return render_template("admin/clients_add.html", form=form)
         slug = form.slug.data.strip() if getattr(form, "slug", None) and form.slug.data else ""
         slug = slugify(slug) if slug else slugify(form.name.data)
         item = ClientLogo(name=form.name.data, slug=slug, position=form.position.data, file_path=web_path)
@@ -283,7 +268,7 @@ def showreel_upload():
 def instagram_add():
     form = UploadInstagramPhotoForm()
     if form.validate_on_submit():
-        web_path = (form.image_url.data or "").strip() if hasattr(form, "image_url") else ""
+        web_path = (form.url.data or "").strip() if hasattr(form, "url") else ""
         if not web_path:
             if not form.image.data:
                 flash("Envie um arquivo ou informe uma URL.", "danger")
@@ -308,7 +293,7 @@ def instagram_add():
 def portfolio_photos_add():
     form = UploadPortfolioPhotoForm()
     if form.validate_on_submit():
-        web_path = (form.image_url.data or "").strip() if hasattr(form, "image_url") else ""
+        web_path = (form.url.data or "").strip() if hasattr(form, "url") else ""
         if not web_path:
             if not form.image.data:
                 flash("Envie um arquivo ou informe uma URL.", "danger")
