@@ -64,6 +64,12 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(admin_bp, url_prefix="/admin")
 
+    # Jinja helpers
+    from .utils import is_vimeo_url, vimeo_embed_url
+
+    app.jinja_env.filters["is_vimeo"] = is_vimeo_url
+    app.jinja_env.filters["vimeo_embed"] = vimeo_embed_url
+
     # Fail-fast: prevent silent fallback to SQLite on Railway (causes "reset" on deploy).
     db_uri = app.config.get("SQLALCHEMY_DATABASE_URI", "")
     if os.getenv("RAILWAY_ENVIRONMENT") and str(db_uri).startswith("sqlite"):

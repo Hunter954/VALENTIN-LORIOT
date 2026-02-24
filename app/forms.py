@@ -44,8 +44,18 @@ class UploadHeroVideoForm(FlaskForm):
     overlay_top = StringField("Texto pequeno (overlay)", validators=[Optional(), Length(max=120)])
     overlay_title = StringField("Texto grande (overlay)", validators=[Optional(), Length(max=120)])
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=99)])
-    video = FileField("Video (mp4/webm/mov)", validators=[DataRequired()])
+    vimeo_url = StringField("Vimeo URL (opcional)", validators=[Optional(), Length(max=255)])
+    video = FileField("Upload Video (mp4/webm/mov)", validators=[Optional()])
     submit = SubmitField("Enviar")
+
+    def validate(self, extra_validators=None):
+        ok = super().validate(extra_validators=extra_validators)
+        if not ok:
+            return False
+        if not (self.vimeo_url.data or getattr(self.video, "data", None)):
+            self.video.errors.append("Envie um arquivo OU informe um link do Vimeo.")
+            return False
+        return True
 
 
 class UploadClientLogoForm(FlaskForm):
@@ -59,14 +69,34 @@ class UploadClientLogoForm(FlaskForm):
 class UploadGalleryVideoForm(FlaskForm):
     title = StringField("Título", validators=[Optional(), Length(max=120)])
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-    video = FileField("Video (mp4/webm/mov)", validators=[DataRequired()])
+    vimeo_url = StringField("Vimeo URL (opcional)", validators=[Optional(), Length(max=255)])
+    video = FileField("Upload Video (mp4/webm/mov)", validators=[Optional()])
     submit = SubmitField("Enviar")
+
+    def validate(self, extra_validators=None):
+        ok = super().validate(extra_validators=extra_validators)
+        if not ok:
+            return False
+        if not (self.vimeo_url.data or getattr(self.video, "data", None)):
+            self.video.errors.append("Envie um arquivo OU informe um link do Vimeo.")
+            return False
+        return True
 
 
 class UploadShowreelForm(FlaskForm):
     title = StringField("Título", validators=[Optional(), Length(max=120)])
-    video = FileField("Showreel (mp4/webm/mov)", validators=[DataRequired()])
+    vimeo_url = StringField("Vimeo URL (opcional)", validators=[Optional(), Length(max=255)])
+    video = FileField("Upload Showreel (mp4/webm/mov)", validators=[Optional()])
     submit = SubmitField("Enviar")
+
+    def validate(self, extra_validators=None):
+        ok = super().validate(extra_validators=extra_validators)
+        if not ok:
+            return False
+        if not (self.vimeo_url.data or getattr(self.video, "data", None)):
+            self.video.errors.append("Envie um arquivo OU informe um link do Vimeo.")
+            return False
+        return True
 
 
 class UploadInstagramPhotoForm(FlaskForm):

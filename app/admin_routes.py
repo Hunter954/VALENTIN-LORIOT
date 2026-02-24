@@ -31,7 +31,7 @@ from .forms import (
     UploadEventMediaForm,
     UploadClientMediaForm,
 )
-from .utils import save_upload, slugify
+from .utils import save_upload, slugify, is_vimeo_url
 
 bp = Blueprint("admin", __name__, template_folder="templates")
 
@@ -142,11 +142,19 @@ def upload_logo():
 def hero_add():
     form = UploadHeroVideoForm()
     if form.validate_on_submit():
-        try:
-            web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
-        except Exception as e:
-            flash(str(e), "danger")
-            return render_template("admin/hero_add.html", form=form)
+        web_path = ""
+        vimeo = (form.vimeo_url.data or "").strip()
+        if vimeo:
+            if not is_vimeo_url(vimeo):
+                flash("Link do Vimeo inválido. Cole a URL do vídeo (ex: https://vimeo.com/123...).", "danger")
+                return render_template("admin/hero_add.html", form=form)
+            web_path = vimeo
+        else:
+            try:
+                web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
+            except Exception as e:
+                flash(str(e), "danger")
+                return render_template("admin/hero_add.html", form=form)
 
         item = HeroVideo(
             title=form.title.data or "Banner",
@@ -210,11 +218,19 @@ def clients_delete(item_id):
 def works_add():
     form = UploadGalleryVideoForm()
     if form.validate_on_submit():
-        try:
-            web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
-        except Exception as e:
-            flash(str(e), "danger")
-            return render_template("admin/gallery_add.html", form=form, section_name="Works")
+        web_path = ""
+        vimeo = (form.vimeo_url.data or "").strip()
+        if vimeo:
+            if not is_vimeo_url(vimeo):
+                flash("Link do Vimeo inválido. Cole a URL do vídeo (ex: https://vimeo.com/123...).", "danger")
+                return render_template("admin/gallery_add.html", form=form, section_name="Works")
+            web_path = vimeo
+        else:
+            try:
+                web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
+            except Exception as e:
+                flash(str(e), "danger")
+                return render_template("admin/gallery_add.html", form=form, section_name="Works")
 
         item = GalleryVideo(title=form.title.data or "Video", position=form.position.data, file_path=web_path)
         db.session.add(item)
@@ -240,11 +256,19 @@ def works_delete(item_id):
 def showreel_upload():
     form = UploadShowreelForm()
     if form.validate_on_submit():
-        try:
-            web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
-        except Exception as e:
-            flash(str(e), "danger")
-            return render_template("admin/showreel.html", form=form)
+        web_path = ""
+        vimeo = (form.vimeo_url.data or "").strip()
+        if vimeo:
+            if not is_vimeo_url(vimeo):
+                flash("Link do Vimeo inválido. Cole a URL do vídeo (ex: https://vimeo.com/123...).", "danger")
+                return render_template("admin/showreel.html", form=form)
+            web_path = vimeo
+        else:
+            try:
+                web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
+            except Exception as e:
+                flash(str(e), "danger")
+                return render_template("admin/showreel.html", form=form)
 
         # Mantém histórico, mas a home usa o mais recente
         item = Showreel(title=form.title.data or "Showreel", file_path=web_path)
