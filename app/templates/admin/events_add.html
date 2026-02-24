@@ -33,19 +33,7 @@
           <div class="col-12">
             <label class="form-label">File</label>
             {{ form.file(class_="form-control") }}
-            <div class="form-text">Upload opcional se você colar uma URL abaixo.</div>
-          </div>
-
-          <div class="col-12" id="imageUrlRow">
-            <label class="form-label">Image URL</label>
-            {{ form.image_url(class_="form-control", placeholder="https://...") }}
-            <div class="form-text">Somente quando Type = image. Você pode colar o link e deixar o upload vazio.</div>
-          </div>
-
-          <div class="col-12" id="vimeoRow" style="display:none;">
-            <label class="form-label">Vimeo URL</label>
-            {{ form.vimeo_url(class_="form-control", placeholder="https://vimeo.com/123456789") }}
-            <div class="form-text">Somente quando Type = video. Você pode colar o link e deixar o upload vazio.</div>
+            <div class="form-text">Para vídeo, prefira MP4/WebM.</div>
           </div>
 
           <div class="col-12 d-flex gap-2">
@@ -77,16 +65,7 @@
               <div class="d-flex gap-3" style="min-width:0;">
                 <div style="width: 180px;">
                   {% if item.kind is defined and item.kind in ['video','Video','VIDEO'] %}
-                    {% if src and ('vimeo.com' in src or 'player.vimeo.com' in src) %}
-                      <iframe
-                        src="{{ src }}"
-                        style="width:100%; aspect-ratio: 16/9; border-radius:10px; border:0;"
-                        allow="autoplay; fullscreen; picture-in-picture"
-                        allowfullscreen
-                        title="Vimeo preview"></iframe>
-                    {% else %}
-                      <video src="{{ src }}" style="width:100%; border-radius:10px;" controls preload="metadata"></video>
-                    {% endif %}
+                    <video src="{{ src }}" style="width:100%; border-radius:10px;" controls preload="metadata"></video>
                   {% else %}
                     <img src="{{ src }}" alt="" style="width:100%; border-radius:10px; object-fit:cover;" />
                   {% endif %}
@@ -117,19 +96,4 @@
     </div>
   </div>
 </div>
-
-<script>
-  (function(){
-    const kindSel = document.querySelector('select[name="kind"]');
-    const vimeoRow = document.getElementById('vimeoRow');
-    const imageUrlRow = document.getElementById('imageUrlRow');
-    function sync(){
-      if(!kindSel || !vimeoRow || !imageUrlRow) return;
-      const isVideo = (kindSel.value === 'video');
-      vimeoRow.style.display = isVideo ? '' : 'none';
-      imageUrlRow.style.display = isVideo ? 'none' : '';
-    }
-    if(kindSel){ kindSel.addEventListener('change', sync); sync(); }
-  })();
-</script>
 {% endblock %}

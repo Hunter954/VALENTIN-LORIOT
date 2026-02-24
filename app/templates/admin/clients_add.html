@@ -14,14 +14,13 @@
         {{ form.position(class="form-control") }}
       </div>
       <div class="mb-3">
-        {{ form.image.label(class="form-label") }}
-        {{ form.image(class="form-control") }}
-        <div class="form-text">Upload ou cole uma URL abaixo.</div>
-      </div>
-      <div class="mb-3">
         {{ form.image_url.label(class="form-label") }}
         {{ form.image_url(class="form-control", placeholder="https://...") }}
-        <div class="form-text">Se preencher a URL, pode deixar o upload vazio.</div>
+        <div class="form-text">Opcional. Se preencher, não precisa enviar arquivo.</div>
+      </div>
+      <div class="mb-3">
+        {{ form.image.label(class="form-label") }}
+        {{ form.image(class="form-control") }}
       </div>
       {{ form.submit(class="btn btn-success") }}
       <a class="btn btn-link" href="{{ url_for('admin.dashboard') }}">Back</a>
