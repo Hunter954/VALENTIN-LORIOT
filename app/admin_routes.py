@@ -178,13 +178,11 @@ def hero_delete(item_id):
 def clients_add():
     form = UploadClientLogoForm()
     if form.validate_on_submit():
-        # aceita upload OU URL
-        url = (getattr(form, "image_url", None).data or "").strip() if getattr(form, "image_url", None) else ""
-        if url:
-            web_path = url
-        else:
+        # Aceita upload OU URL
+        web_path = (form.image_url.data or "").strip() if hasattr(form, "image_url") else ""
+        if not web_path:
             if not form.image.data:
-                flash("Envie um arquivo OU cole uma URL.", "danger")
+                flash("Envie um arquivo ou informe uma URL.", "danger")
                 return render_template("admin/clients_add.html", form=form)
             try:
                 web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
@@ -192,6 +190,21 @@ def clients_add():
                 flash(str(e), "danger")
                 return render_template("admin/clients_add.html", form=form)
 
+        slug = form.slug.data.strip() if getattr(form, "slug", None) and form.slug.data else ""
+        slug = slugify(slug) if slug else slugify(form.name.data)
+        item = ClientLogo(name=form.name.data, slug=slug, position=form.position.data, file_path=web_path)
+        db.session.add(item)
+        db.session.commit()
+        flash("Logo adicionada!", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/clients_add.html", form=form)
+
+    try:
+        web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
+    except Exception as e:
+        flash(str(e), "danger")
+        return render_template("admin/clients_add.html", form=form)
         slug = form.slug.data.strip() if getattr(form, "slug", None) and form.slug.data else ""
         slug = slugify(slug) if slug else slugify(form.name.data)
         item = ClientLogo(name=form.name.data, slug=slug, position=form.position.data, file_path=web_path)
@@ -264,32 +277,22 @@ def showreel_upload():
     return render_template("admin/showreel.html", form=form)
 
 
+
 @bp.route("/instagram/add", methods=["GET", "POST"])
 @login_required
 def instagram_add():
     form = UploadInstagramPhotoForm()
     if form.validate_on_submit():
-        url = (getattr(form, "image_url", None).data or "").strip() if getattr(form, "image_url", None) else ""
-        if url:
-            web_path = url
-        else:
+        web_path = (form.image_url.data or "").strip() if hasattr(form, "image_url") else ""
+        if not web_path:
             if not form.image.data:
-                flash("Envie um arquivo OU cole uma URL.", "danger")
+                flash("Envie um arquivo ou informe uma URL.", "danger")
                 return render_template("admin/instagram_add.html", form=form)
             try:
                 web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
             except Exception as e:
                 flash(str(e), "danger")
                 return render_template("admin/instagram_add.html", form=form)
-
-        item = InstagramPhoto(file_path=web_path, position=form.position.data)
-        db.session.add(item)
-        db.session.commit()
-        flash("Foto adicionada!", "success")
-        return redirect(url_for("admin.dashboard"))
-
-    return render_template("admin/instagram_add.html", form=form)
-
 
         item = InstagramPhoto(file_path=web_path, position=form.position.data)
         db.session.add(item)
@@ -305,12 +308,10 @@ def instagram_add():
 def portfolio_photos_add():
     form = UploadPortfolioPhotoForm()
     if form.validate_on_submit():
-        url = (getattr(form, "image_url", None).data or "").strip() if getattr(form, "image_url", None) else ""
-        if url:
-            web_path = url
-        else:
+        web_path = (form.image_url.data or "").strip() if hasattr(form, "image_url") else ""
+        if not web_path:
             if not form.image.data:
-                flash("Envie um arquivo OU cole uma URL.", "danger")
+                flash("Envie um arquivo ou informe uma URL.", "danger")
                 return render_template("admin/portfolio_photo_add.html", form=form)
             try:
                 web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
@@ -326,16 +327,6 @@ def portfolio_photos_add():
 
     return render_template("admin/portfolio_photo_add.html", form=form)
 
-
-        item = PortfolioPhoto(title=form.title.data or "", position=form.position.data, file_path=web_path)
-        db.session.add(item)
-        db.session.commit()
-        flash("Photo adicionada!", "success")
-        return redirect(url_for("admin.dashboard"))
-
-    return render_template("admin/portfolio_photo_add.html", form=form)
-
-
 @bp.post("/portfolio/photos/<int:item_id>/delete")
 @login_required
 def portfolio_photos_delete(item_id):
@@ -346,6 +337,7 @@ def portfolio_photos_delete(item_id):
     return redirect(url_for("admin.dashboard"))
 
 
+
 @bp.route("/events/add", methods=["GET", "POST"])
 @login_required
 def events_add():
@@ -353,17 +345,10 @@ def events_add():
     if form.validate_on_submit():
         kind = form.kind.data
 
-        image_url = (getattr(form, "image_url", None).data or "").strip() if getattr(form, "image_url", None) else ""
-        vimeo_url = (getattr(form, "vimeo_url", None).data or "").strip() if getattr(form, "vimeo_url", None) else ""
-
-        if kind == "video" and vimeo_url:
-            web_path = vimeo_url
-        elif kind == "image" and image_url:
-            web_path = image_url
-        else:
+        web_path = (form.url.data or "").strip() if hasattr(form, "url") else ""
+        if not web_path:
             if not form.file.data:
-                msg = "Cole a URL (imagem) ou Vimeo URL (vídeo), ou envie um arquivo."
-                flash(msg, "danger")
+                flash("Envie um arquivo ou informe uma URL.", "danger")
                 return render_template("admin/events_add.html", form=form)
             try:
                 web_path = save_upload(
@@ -383,16 +368,6 @@ def events_add():
 
     return render_template("admin/events_add.html", form=form)
 
-
-        item = EventMedia(title=form.title.data or "", kind=kind, position=form.position.data, file_path=web_path)
-        db.session.add(item)
-        db.session.commit()
-        flash("Item adicionado em Events!", "success")
-        return redirect(url_for("admin.dashboard"))
-
-    return render_template("admin/events_add.html", form=form)
-
-
 @bp.post("/events/<int:item_id>/delete")
 @login_required
 def events_delete(item_id):
@@ -401,6 +376,7 @@ def events_delete(item_id):
     db.session.commit()
     flash("Item removido.", "info")
     return redirect(url_for("admin.dashboard"))
+
 
 
 @bp.route("/clients/media/add", methods=["GET", "POST"])
@@ -413,16 +389,11 @@ def clients_media_add():
 
     if form.validate_on_submit():
         kind = form.kind.data
-        image_url = (getattr(form, "image_url", None).data or "").strip() if getattr(form, "image_url", None) else ""
-        vimeo_url = (getattr(form, "vimeo_url", None).data or "").strip() if getattr(form, "vimeo_url", None) else ""
 
-        if kind == "video" and vimeo_url:
-            web_path = vimeo_url
-        elif kind == "image" and image_url:
-            web_path = image_url
-        else:
+        web_path = (form.url.data or "").strip() if hasattr(form, "url") else ""
+        if not web_path:
             if not form.file.data:
-                flash("Cole a URL (imagem) ou Vimeo URL (vídeo), ou envie um arquivo.", "danger")
+                flash("Envie um arquivo ou informe uma URL.", "danger")
                 return render_template("admin/clients_media_add.html", form=form)
             try:
                 web_path = save_upload(
@@ -454,29 +425,6 @@ def clients_media_add():
         return redirect(url_for("admin.dashboard"))
 
     return render_template("admin/clients_media_add.html", form=form)
-
-
-        if kind == "video":
-            item = ClientVideo(
-                client_id=form.client_id.data,
-                title=form.title.data or "",
-                position=form.position.data,
-                file_path=web_path,
-            )
-        else:
-            item = ClientPhoto(
-                client_id=form.client_id.data,
-                title=form.title.data or "",
-                position=form.position.data,
-                file_path=web_path,
-            )
-        db.session.add(item)
-        db.session.commit()
-        flash("Mídia do cliente adicionada!", "success")
-        return redirect(url_for("admin.dashboard"))
-
-    return render_template("admin/clients_media_add.html", form=form)
-
 
 @bp.post("/clients/media/<string:kind>/<int:item_id>/delete")
 @login_required

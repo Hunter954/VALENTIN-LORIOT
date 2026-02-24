@@ -52,13 +52,8 @@ class UploadClientLogoForm(FlaskForm):
     name = StringField("Nome", validators=[DataRequired(), Length(max=120)])
     slug = StringField("Slug (URL)", validators=[Optional(), Length(max=140)])
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-
-    # Upload OU URL
-    image = FileField("Logo (png/svg/jpg/webp)", validators=[Optional()])
-    image_url = StringField("Logo URL (opcional)", validators=[Optional(), Length(max=500)])
-
+    image = FileField(\"Logo (png/svg/jpg/webp)\", validators=[Optional()]\)
     submit = SubmitField("Enviar")
-
 
 
 class UploadGalleryVideoForm(FlaskForm):
@@ -76,13 +71,8 @@ class UploadShowreelForm(FlaskForm):
 
 class UploadInstagramPhotoForm(FlaskForm):
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-
-    # Upload OU URL
-    image = FileField("Photo (png/jpg/webp)", validators=[Optional()])
-    image_url = StringField("Image URL (opcional)", validators=[Optional(), Length(max=500)])
-
+    image = FileField(\"Photo (png/jpg/webp)\", validators=[Optional()]\)
     submit = SubmitField("Enviar")
-
 
 
 class SocialLinkForm(FlaskForm):
@@ -100,13 +90,8 @@ class SocialLinkForm(FlaskForm):
 class UploadPortfolioPhotoForm(FlaskForm):
     title = StringField("Título", validators=[Optional(), Length(max=120)])
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-
-    # Upload OU URL
-    image = FileField("Photo (png/jpg/webp)", validators=[Optional()])
-    image_url = StringField("Image URL (opcional)", validators=[Optional(), Length(max=500)])
-
+    image = FileField(\"Photo (png/jpg/webp)\", validators=[Optional()]\)
     submit = SubmitField("Enviar")
-
 
 
 class UploadEventMediaForm(FlaskForm):
@@ -118,14 +103,8 @@ class UploadEventMediaForm(FlaskForm):
         default="image",
     )
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-
-    # Upload OU URL (imagem) / Vimeo URL (vídeo)
-    file = FileField("Arquivo (imagem ou vídeo)", validators=[Optional()])
-    image_url = StringField("Image URL (opcional)", validators=[Optional(), Length(max=500)])
-    vimeo_url = StringField("Vimeo URL (opcional)", validators=[Optional(), Length(max=500)])
-
+    file = FileField(\"Arquivo (imagem ou vídeo)\", validators=[Optional()]\)
     submit = SubmitField("Enviar")
-
 
 
 class UploadClientMediaForm(FlaskForm):
@@ -138,14 +117,8 @@ class UploadClientMediaForm(FlaskForm):
         default="image",
     )
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-
-    # Upload OU URL (imagem) / Vimeo URL (vídeo)
-    file = FileField("Arquivo", validators=[Optional()])
-    image_url = StringField("Image URL (opcional)", validators=[Optional(), Length(max=500)])
-    vimeo_url = StringField("Vimeo URL (opcional)", validators=[Optional(), Length(max=500)])
-
+    file = FileField(\"Arquivo\", validators=[Optional()]\)
     submit = SubmitField("Enviar")
-
 
 
 class ContactForm(FlaskForm):
