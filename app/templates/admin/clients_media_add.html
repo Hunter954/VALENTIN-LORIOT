@@ -38,6 +38,13 @@
           <div class="col-12">
             <label class="form-label">File</label>
             {{ form.file(class_="form-control") }}
+            <div class="form-text">Imagem: png/jpg/webp • Vídeo (upload): mp4/webm/mov (opcional se usar Vimeo)</div>
+          </div>
+
+          <div class="col-12" id="vimeoRow" style="display:none;">
+            <label class="form-label">Vimeo URL</label>
+            {{ form.vimeo_url(class_="form-control", placeholder="https://vimeo.com/123456789") }}
+            <div class="form-text">Somente quando Type = video. Você pode colar o link e deixar o upload vazio.</div>
           </div>
 
           <div class="col-12 d-flex gap-2">
@@ -69,7 +76,16 @@
               <div class="d-flex gap-3" style="min-width:0;">
                 <div style="width: 180px;">
                   {% if m.kind is defined and m.kind in ['video','Video','VIDEO'] %}
-                    <video src="{{ src }}" style="width:100%; border-radius:10px;" controls preload="metadata"></video>
+                    {% if src and ('vimeo.com' in src or 'player.vimeo.com' in src) %}
+                      <iframe
+                        src="{{ src }}"
+                        style="width:100%; aspect-ratio: 16/9; border-radius:10px; border:0;"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowfullscreen
+                        title="Vimeo preview"></iframe>
+                    {% else %}
+                      <video src="{{ src }}" style="width:100%; border-radius:10px;" controls preload="metadata"></video>
+                    {% endif %}
                   {% else %}
                     <img src="{{ src }}" alt="" style="width:100%; border-radius:10px; object-fit:cover;" />
                   {% endif %}
@@ -88,7 +104,8 @@
               </div>
 
               {% if m.id is defined %}
-              <form method="post" action="{{ url_for('admin.clients_media_delete', item_id=m.id) }}">
+              {% set del_kind = 'video' if (m.kind is defined and m.kind in ['video','Video','VIDEO']) else 'image' %}
+              <form method="post" action="{{ url_for('admin.clients_media_delete', kind=del_kind, item_id=m.id) }}">
                 <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Remover este item?')">Excluir</button>
               </form>
               {% endif %}
@@ -101,4 +118,16 @@
     </div>
   </div>
 </div>
+
+<script>
+  (function(){
+    const kindSel = document.querySelector('select[name="kind"]');
+    const vimeoRow = document.getElementById('vimeoRow');
+    function sync(){
+      if(!kindSel || !vimeoRow) return;
+      vimeoRow.style.display = (kindSel.value === 'video') ? '' : 'none';
+    }
+    if(kindSel){ kindSel.addEventListener('change', sync); sync(); }
+  })();
+</script>
 {% endblock %}
