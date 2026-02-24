@@ -29,7 +29,13 @@
           <div class="col-12">
             <label class="form-label">Image</label>
             {{ form.image(class_="form-control") }}
-            <div class="form-text">Formatos recomendados: JPG/PNG/WebP.</div>
+            <div class="form-text">Envie o arquivo <strong>ou</strong> use uma URL abaixo.</div>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Photo URL (opcional)</label>
+            {{ form.url(class_="form-control", placeholder="https://...") }}
+            <div class="form-text">Link direto para a imagem (JPG/PNG/WebP).</div>
           </div>
 
           <div class="col-12 d-flex gap-2">
