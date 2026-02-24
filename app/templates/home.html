@@ -8,7 +8,7 @@
   .hero-slide{
     position: relative;
     width: 100%;
-    height: 100svh;   /* melhor no mobile (barra do navegador) */
+    height: 100svh;
     overflow: hidden;
     background:#000;
   }
@@ -20,31 +20,31 @@
     object-fit:cover;
   }
 
-  /* Vimeo/YT iframe (geral) */
+  /* Vimeo iframe (desktop/tablet): cover via proporção */
   .hero-embed{
     position:absolute;
     top:50%; left:50%;
     width:100vw;
-    height:56.25vw;         /* 16:9 baseado em vw */
-    min-width:177.78svh;    /* 16:9 baseado em svh */
+    height:56.25vw;
+    min-width:177.78svh;
     min-height:100svh;
     transform:translate(-50%,-50%);
     border:0;
-    pointer-events:none;     /* não deixa clicar/abrir UI */
+    pointer-events:none;
     background:#000;
   }
 
-  /* MOBILE PORTRAIT: enche a tela (crop/zoom) */
+  /* ✅ MOBILE PORTRAIT: FULLSCREEN COM ZOOM (sem “quadradinho”) */
   @media (max-width: 900px) and (orientation: portrait){
-    .hero-slide{ height:100svh; }
+    .hero, .hero-scroller, .hero-slide { height: 100svh; }
 
-    /* Faz cover agressivo no portrait (pra parecer 9:16 preenchido) */
+    /* Aqui a gente garante que ocupa 100% do slide e dá zoom */
     .hero-embed{
-      width:120vw;
-      height:120svh;
-      min-width:120vw;
-      min-height:120svh;
-      transform:translate(-50%,-50%) scale(1.12);
+      width:100%;
+      height:100%;
+      min-width:0;
+      min-height:0;
+      transform: translate(-50%,-50%) scale(1.45); /* ajuste o zoom aqui */
     }
   }
 
@@ -63,7 +63,7 @@
   }
 
   /* ================= SHOWREEL ================= */
-  .showreel-inner{ position:relative; overflow:hidden; }
+  .showreel-inner{ position:relative; overflow:hidden; background:#000; }
   .showreel-video{
     position:absolute; inset:0;
     width:100%; height:100%;
@@ -83,11 +83,11 @@
   }
   @media (max-width: 900px) and (orientation: portrait){
     .showreel-embed{
-      width:120vw;
-      height:120svh;
-      min-width:120vw;
-      min-height:100%;
-      transform:translate(-50%,-50%) scale(1.12);
+      width:100%;
+      height:100%;
+      min-width:0;
+      min-height:0;
+      transform: translate(-50%,-50%) scale(1.35);
     }
   }
 </style>
@@ -142,7 +142,6 @@
 
         <div class="hero-slide" data-index="{{ loop.index0 }}">
           {% if is_vimeo %}
-            <!-- src será montado via JS para garantir background=1 (sem UI no mobile) -->
             <iframe
               class="hero-embed vimeo-bg"
               data-src="{{ path }}"
@@ -355,25 +354,20 @@
 </footer>
 
 <script>
-  // Converte QUALQUER URL do Vimeo em "background embed" (sem UI) e seta no iframe
   (function () {
     function buildVimeoBackgroundUrl(raw) {
       if (!raw) return "";
-
-      // já é player.vimeo.com/video/ID...
       let id = null;
 
-      // pega o primeiro número longo do link (id do Vimeo)
       const m = String(raw).match(/vimeo\.com\/(?:video\/)?(\d+)/i);
       if (m && m[1]) id = m[1];
 
-      // fallback: se já veio com /video/123...
       if (!id) {
         const m2 = String(raw).match(/player\.vimeo\.com\/video\/(\d+)/i);
         if (m2 && m2[1]) id = m2[1];
       }
 
-      if (!id) return raw; // se não conseguir extrair, deixa como veio
+      if (!id) return raw;
 
       const params = new URLSearchParams({
         background: "1",
@@ -392,8 +386,7 @@
 
     document.querySelectorAll("iframe.vimeo-bg").forEach(function (iframe) {
       const raw = iframe.getAttribute("data-src") || "";
-      const url = buildVimeoBackgroundUrl(raw);
-      iframe.setAttribute("src", url);
+      iframe.setAttribute("src", buildVimeoBackgroundUrl(raw));
     });
   })();
 </script>
