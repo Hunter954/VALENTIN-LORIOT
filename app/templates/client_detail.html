@@ -33,18 +33,10 @@
       <h2 class="section-title">VIDEOS</h2>
       <div class="works-grid">
         {% for v in videos %}
-          {% set src = (v.file_path or '') %}
-          {% set is_vimeo = ('vimeo.com' in src) or ('player.vimeo.com' in src) %}
           <div class="works-item">
-            <a href="#" class="media-popup-link" data-popup="1" data-type="video" data-src="{{ src }}">
-              {% if is_vimeo %}
-                <iframe class="works-embed vimeo-bg" data-src="{{ src }}" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Vimeo"></iframe>
-              {% else %}
-                <video class="works-video" playsinline muted autoplay preload="metadata" loop>
-                  <source src="{{ src }}" type="video/mp4">
-                </video>
-              {% endif %}
-            </a>
+            <a href="#" class="media-popup-link" data-popup="1" data-type="video" data-src="{{ v.file_path }}"><video class="works-video" playsinline muted autoplay preload="metadata" loop>
+              <source src="{{ v.file_path }}" type="video/mp4">
+            </video></a>
             {% if v.title %}
               <div class="works-item-overlay">{{ v.title }}</div>
             {% endif %}
@@ -80,7 +72,6 @@
 
     <img id="mediaModalImg" class="media-modal__img" alt="" style="display:none;">
     <video id="mediaModalVideo" class="media-modal__video" controls playsinline controlsList="nodownload noplaybackrate" disablepictureinpicture oncontextmenu="return false;" style="display:none;"></video>
-    <iframe id="mediaModalVimeo" class="media-modal__video" style="display:none; border:0;" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Vimeo player"></iframe>
   </div>
 </div>
 
@@ -108,7 +99,6 @@
   }
   .media-modal__img { width: 100%; height: auto; border-radius: 10px; }
   .media-modal__video { width: 100%; max-height: 70vh; border-radius: 10px; }
-  .works-embed { position:absolute; inset:0; width:100%; height:100%; border:0; pointer-events:none; }
   .works-item a.media-popup-link { display:block; color: inherit; text-decoration:none; }
   /* Hide any residual video UI on thumbnails */
   .works-video::-webkit-media-controls { display:none !important; }
@@ -120,7 +110,6 @@
     const modal = document.getElementById("mediaModal");
     const img = document.getElementById("mediaModalImg");
     const video = document.getElementById("mediaModalVideo");
-    const vimeoFrame = document.getElementById("mediaModalVimeo");
 
     // Prevent right-click download menu on the modal video (best-effort)
     video.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -136,30 +125,15 @@
       video.pause();
       video.removeAttribute("src");
       video.load();
-      vimeoFrame.style.display = "none";
-      vimeoFrame.removeAttribute("src");
 
       if (type === "image") {
         img.src = src;
         img.style.display = "block";
       } else {
-        const isVimeo = /vimeo\.com\/(?:video\/)?\d+|player\.vimeo\.com\/video\/\d+/i.test(src || "");
-        if (isVimeo) {
-          const idMatch = String(src).match(/(?:vimeo\.com\/(?:video\/)?|player\.vimeo\.com\/video\/)(\d+)/i);
-          const id = idMatch ? idMatch[1] : null;
-          if (id) {
-            const params = new URLSearchParams({autoplay:"1", muted:"0", loop:"0", title:"0", byline:"0", portrait:"0", dnt:"1"});
-            vimeoFrame.src = "https://player.vimeo.com/video/" + id + "?" + params.toString();
-          } else {
-            vimeoFrame.src = src;
-          }
-          vimeoFrame.style.display = "block";
-        } else {
-          if (poster) video.setAttribute("poster", poster);
-          video.src = src;
-          video.style.display = "block";
-          setTimeout(() => video.play().catch(() => {}), 50);
-        }
+        if (poster) video.setAttribute("poster", poster);
+        video.src = src;
+        video.style.display = "block";
+        setTimeout(() => video.play().catch(() => {}), 50);
       }
     }
 
@@ -171,7 +145,6 @@
       video.pause();
       video.removeAttribute("src");
       video.load();
-      vimeoFrame.removeAttribute("src");
       img.removeAttribute("src");
     }
 
@@ -196,20 +169,6 @@
       if (!src) return;
       openModal({ type, src, poster });
     });
-  })();
-</script>
-
-<script>
-  (function(){
-    function bgUrl(raw){
-      if(!raw) return "";
-      const m = String(raw).match(/(?:vimeo\.com\/(?:video\/)?|player\.vimeo\.com\/video\/)(\d+)/i);
-      if(!m) return raw;
-      const id = m[1];
-      const p = new URLSearchParams({background:"1", autoplay:"1", loop:"1", muted:"1", autopause:"0", title:"0", byline:"0", portrait:"0", dnt:"1"});
-      return "https://player.vimeo.com/video/"+id+"?"+p.toString();
-    }
-    document.querySelectorAll('iframe.vimeo-bg').forEach((f)=>{f.src = bgUrl(f.getAttribute('data-src')||"");});
   })();
 </script>
 {% endblock %}

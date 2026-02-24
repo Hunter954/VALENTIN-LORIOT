@@ -38,7 +38,13 @@
           <div class="col-12">
             <label class="form-label">File</label>
             {{ form.file(class_="form-control") }}
-            <div class="form-text">Imagem: png/jpg/webp • Vídeo (upload): mp4/webm/mov (opcional se usar Vimeo)</div>
+            <div class="form-text">Upload opcional se você colar uma URL abaixo.</div>
+          </div>
+
+          <div class="col-12" id="imageUrlRow">
+            <label class="form-label">Image URL</label>
+            {{ form.image_url(class_="form-control", placeholder="https://...") }}
+            <div class="form-text">Somente quando Type = image. Você pode colar o link e deixar o upload vazio.</div>
           </div>
 
           <div class="col-12" id="vimeoRow" style="display:none;">
@@ -123,9 +129,12 @@
   (function(){
     const kindSel = document.querySelector('select[name="kind"]');
     const vimeoRow = document.getElementById('vimeoRow');
+    const imageUrlRow = document.getElementById('imageUrlRow');
     function sync(){
-      if(!kindSel || !vimeoRow) return;
-      vimeoRow.style.display = (kindSel.value === 'video') ? '' : 'none';
+      if(!kindSel || !vimeoRow || !imageUrlRow) return;
+      const isVideo = (kindSel.value === 'video');
+      vimeoRow.style.display = isVideo ? '' : 'none';
+      imageUrlRow.style.display = isVideo ? 'none' : '';
     }
     if(kindSel){ kindSel.addEventListener('change', sync); sync(); }
   })();
