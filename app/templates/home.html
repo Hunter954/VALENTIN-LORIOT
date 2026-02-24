@@ -2,75 +2,74 @@
 {% block body %}
 
 <style>
-  /* ===== HERO FULLSCREEN (melhor no mobile) ===== */
+  /* ================= HERO FULLSCREEN ================= */
   .hero { position: relative; overflow: hidden; background:#000; }
   .hero-scroller { position: relative; width: 100%; height: 100%; }
-  .hero-slide {
+  .hero-slide{
     position: relative;
     width: 100%;
-    height: 100svh; /* melhor que 100vh no mobile */
+    height: 100svh;   /* melhor no mobile (barra do navegador) */
     overflow: hidden;
     background:#000;
   }
 
-  /* ===== Local <video> ===== */
-  .hero-video {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  /* ===== Vimeo <iframe> (DESKTOP/TABLET: cover) ===== */
-  .hero-embed {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100vw;
-    height: 56.25vw;       /* 16:9 baseado em vw */
-    min-width: 177.78svh;  /* 16:9 baseado em svh */
-    min-height: 100svh;
-    transform: translate(-50%, -50%);
-    border: 0;
-    pointer-events: none;  /* sem clique/controles */
-  }
-
-  /* ===== MOBILE PORTRAIT: “enche a tela” (crop mais agressivo) ===== */
-  @media (max-width: 900px) and (orientation: portrait) {
-    .hero-slide { height: 100svh; }
-
-    /* Aqui a gente “vira a lógica” pra ficar mais vertical e ocupar 9:16 */
-    .hero-embed {
-      width: 100vw;
-      height: 177.78vw;     /* super alto, força crop lateral/zoom */
-      min-width: 100vw;
-      min-height: 100svh;
-      transform: translate(-50%, -50%);
-    }
-  }
-
-  /* ===== Overlay (mantém seu layout) ===== */
-  .hero-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
-  .hero-overlay-inner { text-align:center; }
-
-  /* ===== WORKS ===== */
-  .works-item { position: relative; overflow: hidden; }
-  .works-video { width:100%; height:100%; object-fit:cover; }
-  .works-embed {
-    position:absolute; inset:0;
-    width:100%; height:100%;
-    border:0; pointer-events:none;
-  }
-
-  /* ===== SHOWREEL ===== */
-  .showreel-inner { position: relative; overflow: hidden; }
-  .showreel-video {
+  /* Vídeo local */
+  .hero-video{
     position:absolute; inset:0;
     width:100%; height:100%;
     object-fit:cover;
   }
-  .showreel-embed {
+
+  /* Vimeo/YT iframe (geral) */
+  .hero-embed{
+    position:absolute;
+    top:50%; left:50%;
+    width:100vw;
+    height:56.25vw;         /* 16:9 baseado em vw */
+    min-width:177.78svh;    /* 16:9 baseado em svh */
+    min-height:100svh;
+    transform:translate(-50%,-50%);
+    border:0;
+    pointer-events:none;     /* não deixa clicar/abrir UI */
+    background:#000;
+  }
+
+  /* MOBILE PORTRAIT: enche a tela (crop/zoom) */
+  @media (max-width: 900px) and (orientation: portrait){
+    .hero-slide{ height:100svh; }
+
+    /* Faz cover agressivo no portrait (pra parecer 9:16 preenchido) */
+    .hero-embed{
+      width:120vw;
+      height:120svh;
+      min-width:120vw;
+      min-height:120svh;
+      transform:translate(-50%,-50%) scale(1.12);
+    }
+  }
+
+  /* ================= Overlay ================= */
+  .hero-overlay{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .hero-overlay-inner{ text-align:center; }
+
+  /* ================= WORKS ================= */
+  .works-item{ position:relative; overflow:hidden; }
+  .works-video{ width:100%; height:100%; object-fit:cover; }
+  .works-embed{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    border:0;
+    pointer-events:none;
+  }
+
+  /* ================= SHOWREEL ================= */
+  .showreel-inner{ position:relative; overflow:hidden; }
+  .showreel-video{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+  }
+  .showreel-embed{
     position:absolute;
     top:50%; left:50%;
     width:100vw;
@@ -80,13 +79,15 @@
     transform:translate(-50%,-50%);
     border:0;
     pointer-events:none;
+    background:#000;
   }
-  @media (max-width: 900px) and (orientation: portrait) {
-    .showreel-embed {
-      width:100vw;
-      height:177.78vw;
-      min-width:100vw;
+  @media (max-width: 900px) and (orientation: portrait){
+    .showreel-embed{
+      width:120vw;
+      height:120svh;
+      min-width:120vw;
       min-height:100%;
+      transform:translate(-50%,-50%) scale(1.12);
     }
   }
 </style>
@@ -141,9 +142,11 @@
 
         <div class="hero-slide" data-index="{{ loop.index0 }}">
           {% if is_vimeo %}
+            <!-- src será montado via JS para garantir background=1 (sem UI no mobile) -->
             <iframe
-              class="hero-embed"
-              src="{{ path }}"
+              class="hero-embed vimeo-bg"
+              data-src="{{ path }}"
+              src=""
               allow="autoplay; fullscreen; picture-in-picture"
               allowfullscreen
               title="Vimeo background video">
@@ -195,11 +198,12 @@
 
       {% if showreel_is_vimeo %}
         <iframe
-          class="showreel-embed"
-          src="{{ spath }}"
+          class="showreel-embed vimeo-bg"
+          data-src="{{ spath }}"
+          src=""
           allow="autoplay; fullscreen; picture-in-picture"
           allowfullscreen
-          title="Showreel vimeo">
+          title="Showreel vimeo background">
         </iframe>
       {% else %}
         <video class="showreel-video" playsinline muted preload="metadata" loop>
@@ -252,11 +256,12 @@
         <div class="works-item">
           {% if works_is_vimeo %}
             <iframe
-              class="works-embed"
-              src="{{ wpath }}"
+              class="works-embed vimeo-bg"
+              data-src="{{ wpath }}"
+              src=""
               allow="autoplay; fullscreen; picture-in-picture"
               allowfullscreen
-              title="Works vimeo">
+              title="Works vimeo background">
             </iframe>
           {% else %}
             <video class="works-video" playsinline muted preload="metadata" loop>
@@ -348,5 +353,49 @@
     </div>
   </div>
 </footer>
+
+<script>
+  // Converte QUALQUER URL do Vimeo em "background embed" (sem UI) e seta no iframe
+  (function () {
+    function buildVimeoBackgroundUrl(raw) {
+      if (!raw) return "";
+
+      // já é player.vimeo.com/video/ID...
+      let id = null;
+
+      // pega o primeiro número longo do link (id do Vimeo)
+      const m = String(raw).match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+      if (m && m[1]) id = m[1];
+
+      // fallback: se já veio com /video/123...
+      if (!id) {
+        const m2 = String(raw).match(/player\.vimeo\.com\/video\/(\d+)/i);
+        if (m2 && m2[1]) id = m2[1];
+      }
+
+      if (!id) return raw; // se não conseguir extrair, deixa como veio
+
+      const params = new URLSearchParams({
+        background: "1",
+        autoplay: "1",
+        loop: "1",
+        muted: "1",
+        autopause: "0",
+        title: "0",
+        byline: "0",
+        portrait: "0",
+        dnt: "1"
+      });
+
+      return "https://player.vimeo.com/video/" + id + "?" + params.toString();
+    }
+
+    document.querySelectorAll("iframe.vimeo-bg").forEach(function (iframe) {
+      const raw = iframe.getAttribute("data-src") || "";
+      const url = buildVimeoBackgroundUrl(raw);
+      iframe.setAttribute("src", url);
+    });
+  })();
+</script>
 
 {% endblock %}
