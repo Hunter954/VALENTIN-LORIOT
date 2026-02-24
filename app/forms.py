@@ -44,8 +44,7 @@ class UploadHeroVideoForm(FlaskForm):
     overlay_top = StringField("Texto pequeno (overlay)", validators=[Optional(), Length(max=120)])
     overlay_title = StringField("Texto grande (overlay)", validators=[Optional(), Length(max=120)])
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=99)])
-    vimeo_url = StringField("Vimeo URL (opcional)", validators=[Optional(), Length(max=255)])
-    video = FileField("Video (mp4/webm/mov) (opcional)", validators=[Optional()])
+    video = FileField("Video (mp4/webm/mov)", validators=[DataRequired()])
     submit = SubmitField("Enviar")
 
 
@@ -53,29 +52,37 @@ class UploadClientLogoForm(FlaskForm):
     name = StringField("Nome", validators=[DataRequired(), Length(max=120)])
     slug = StringField("Slug (URL)", validators=[Optional(), Length(max=140)])
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-    image = FileField("Logo (png/svg/jpg/webp)", validators=[DataRequired()])
+
+    # Upload OU URL
+    image = FileField("Logo (png/svg/jpg/webp)", validators=[Optional()])
+    image_url = StringField("Logo URL (opcional)", validators=[Optional(), Length(max=500)])
+
     submit = SubmitField("Enviar")
+
 
 
 class UploadGalleryVideoForm(FlaskForm):
     title = StringField("Título", validators=[Optional(), Length(max=120)])
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-    vimeo_url = StringField("Vimeo URL (opcional)", validators=[Optional(), Length(max=255)])
-    video = FileField("Video (mp4/webm/mov) (opcional)", validators=[Optional()])
+    video = FileField("Video (mp4/webm/mov)", validators=[DataRequired()])
     submit = SubmitField("Enviar")
 
 
 class UploadShowreelForm(FlaskForm):
     title = StringField("Título", validators=[Optional(), Length(max=120)])
-    vimeo_url = StringField("Vimeo URL (opcional)", validators=[Optional(), Length(max=255)])
-    video = FileField("Showreel (mp4/webm/mov) (opcional)", validators=[Optional()])
+    video = FileField("Showreel (mp4/webm/mov)", validators=[DataRequired()])
     submit = SubmitField("Enviar")
 
 
 class UploadInstagramPhotoForm(FlaskForm):
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-    image = FileField("Photo (png/jpg/webp)", validators=[DataRequired()])
+
+    # Upload OU URL
+    image = FileField("Photo (png/jpg/webp)", validators=[Optional()])
+    image_url = StringField("Image URL (opcional)", validators=[Optional(), Length(max=500)])
+
     submit = SubmitField("Enviar")
+
 
 
 class SocialLinkForm(FlaskForm):
@@ -93,8 +100,13 @@ class SocialLinkForm(FlaskForm):
 class UploadPortfolioPhotoForm(FlaskForm):
     title = StringField("Título", validators=[Optional(), Length(max=120)])
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-    image = FileField("Photo (png/jpg/webp)", validators=[DataRequired()])
+
+    # Upload OU URL
+    image = FileField("Photo (png/jpg/webp)", validators=[Optional()])
+    image_url = StringField("Image URL (opcional)", validators=[Optional(), Length(max=500)])
+
     submit = SubmitField("Enviar")
+
 
 
 class UploadEventMediaForm(FlaskForm):
@@ -106,9 +118,14 @@ class UploadEventMediaForm(FlaskForm):
         default="image",
     )
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-    vimeo_url = StringField("Vimeo URL (somente para vídeo)", validators=[Optional(), Length(max=255)])
+
+    # Upload OU URL (imagem) / Vimeo URL (vídeo)
     file = FileField("Arquivo (imagem ou vídeo)", validators=[Optional()])
+    image_url = StringField("Image URL (opcional)", validators=[Optional(), Length(max=500)])
+    vimeo_url = StringField("Vimeo URL (opcional)", validators=[Optional(), Length(max=500)])
+
     submit = SubmitField("Enviar")
+
 
 
 class UploadClientMediaForm(FlaskForm):
@@ -121,9 +138,14 @@ class UploadClientMediaForm(FlaskForm):
         default="image",
     )
     position = IntegerField("Ordem", validators=[DataRequired(), NumberRange(min=1, max=999)])
-    vimeo_url = StringField("Vimeo URL (somente para vídeo)", validators=[Optional(), Length(max=255)])
+
+    # Upload OU URL (imagem) / Vimeo URL (vídeo)
     file = FileField("Arquivo", validators=[Optional()])
+    image_url = StringField("Image URL (opcional)", validators=[Optional(), Length(max=500)])
+    vimeo_url = StringField("Vimeo URL (opcional)", validators=[Optional(), Length(max=500)])
+
     submit = SubmitField("Enviar")
+
 
 
 class ContactForm(FlaskForm):

@@ -142,17 +142,11 @@ def upload_logo():
 def hero_add():
     form = UploadHeroVideoForm()
     if form.validate_on_submit():
-        # Vimeo link OR file upload
-        web_path = (form.vimeo_url.data or "").strip()
-        if not web_path:
-            if not form.video.data:
-                flash("Envie um arquivo de vídeo ou cole um link do Vimeo.", "danger")
-                return render_template("admin/hero_add.html", form=form)
-            try:
-                web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
-            except Exception as e:
-                flash(str(e), "danger")
-                return render_template("admin/hero_add.html", form=form)
+        try:
+            web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
+        except Exception as e:
+            flash(str(e), "danger")
+            return render_template("admin/hero_add.html", form=form)
 
         item = HeroVideo(
             title=form.title.data or "Banner",
@@ -184,11 +178,19 @@ def hero_delete(item_id):
 def clients_add():
     form = UploadClientLogoForm()
     if form.validate_on_submit():
-        try:
-            web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
-        except Exception as e:
-            flash(str(e), "danger")
-            return render_template("admin/clients_add.html", form=form)
+        # aceita upload OU URL
+        url = (getattr(form, "image_url", None).data or "").strip() if getattr(form, "image_url", None) else ""
+        if url:
+            web_path = url
+        else:
+            if not form.image.data:
+                flash("Envie um arquivo OU cole uma URL.", "danger")
+                return render_template("admin/clients_add.html", form=form)
+            try:
+                web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
+            except Exception as e:
+                flash(str(e), "danger")
+                return render_template("admin/clients_add.html", form=form)
 
         slug = form.slug.data.strip() if getattr(form, "slug", None) and form.slug.data else ""
         slug = slugify(slug) if slug else slugify(form.name.data)
@@ -216,16 +218,11 @@ def clients_delete(item_id):
 def works_add():
     form = UploadGalleryVideoForm()
     if form.validate_on_submit():
-        web_path = (form.vimeo_url.data or "").strip()
-        if not web_path:
-            if not form.video.data:
-                flash("Envie um arquivo de vídeo ou cole um link do Vimeo.", "danger")
-                return render_template("admin/gallery_add.html", form=form, section_name="Works")
-            try:
-                web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
-            except Exception as e:
-                flash(str(e), "danger")
-                return render_template("admin/gallery_add.html", form=form, section_name="Works")
+        try:
+            web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
+        except Exception as e:
+            flash(str(e), "danger")
+            return render_template("admin/gallery_add.html", form=form, section_name="Works")
 
         item = GalleryVideo(title=form.title.data or "Video", position=form.position.data, file_path=web_path)
         db.session.add(item)
@@ -251,16 +248,11 @@ def works_delete(item_id):
 def showreel_upload():
     form = UploadShowreelForm()
     if form.validate_on_submit():
-        web_path = (form.vimeo_url.data or "").strip()
-        if not web_path:
-            if not form.video.data:
-                flash("Envie um arquivo de vídeo ou cole um link do Vimeo.", "danger")
-                return render_template("admin/showreel.html", form=form)
-            try:
-                web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
-            except Exception as e:
-                flash(str(e), "danger")
-                return render_template("admin/showreel.html", form=form)
+        try:
+            web_path = save_upload(form.video.data, current_app.config["UPLOAD_FOLDER"], "video")
+        except Exception as e:
+            flash(str(e), "danger")
+            return render_template("admin/showreel.html", form=form)
 
         # Mantém histórico, mas a home usa o mais recente
         item = Showreel(title=form.title.data or "Showreel", file_path=web_path)
@@ -277,11 +269,27 @@ def showreel_upload():
 def instagram_add():
     form = UploadInstagramPhotoForm()
     if form.validate_on_submit():
-        try:
-            web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
-        except Exception as e:
-            flash(str(e), "danger")
-            return render_template("admin/instagram_add.html", form=form)
+        url = (getattr(form, "image_url", None).data or "").strip() if getattr(form, "image_url", None) else ""
+        if url:
+            web_path = url
+        else:
+            if not form.image.data:
+                flash("Envie um arquivo OU cole uma URL.", "danger")
+                return render_template("admin/instagram_add.html", form=form)
+            try:
+                web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
+            except Exception as e:
+                flash(str(e), "danger")
+                return render_template("admin/instagram_add.html", form=form)
+
+        item = InstagramPhoto(file_path=web_path, position=form.position.data)
+        db.session.add(item)
+        db.session.commit()
+        flash("Foto adicionada!", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/instagram_add.html", form=form)
+
 
         item = InstagramPhoto(file_path=web_path, position=form.position.data)
         db.session.add(item)
@@ -297,11 +305,27 @@ def instagram_add():
 def portfolio_photos_add():
     form = UploadPortfolioPhotoForm()
     if form.validate_on_submit():
-        try:
-            web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
-        except Exception as e:
-            flash(str(e), "danger")
-            return render_template("admin/portfolio_photo_add.html", form=form)
+        url = (getattr(form, "image_url", None).data or "").strip() if getattr(form, "image_url", None) else ""
+        if url:
+            web_path = url
+        else:
+            if not form.image.data:
+                flash("Envie um arquivo OU cole uma URL.", "danger")
+                return render_template("admin/portfolio_photo_add.html", form=form)
+            try:
+                web_path = save_upload(form.image.data, current_app.config["UPLOAD_FOLDER"], "image")
+            except Exception as e:
+                flash(str(e), "danger")
+                return render_template("admin/portfolio_photo_add.html", form=form)
+
+        item = PortfolioPhoto(title=form.title.data or "", position=form.position.data, file_path=web_path)
+        db.session.add(item)
+        db.session.commit()
+        flash("Photo adicionada!", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/portfolio_photo_add.html", form=form)
+
 
         item = PortfolioPhoto(title=form.title.data or "", position=form.position.data, file_path=web_path)
         db.session.add(item)
@@ -328,23 +352,37 @@ def events_add():
     form = UploadEventMediaForm()
     if form.validate_on_submit():
         kind = form.kind.data
-        web_path = ""
-        if kind == "video":
-            web_path = (form.vimeo_url.data or "").strip()
-            if not web_path and not form.file.data:
-                flash("Para vídeo: envie um arquivo ou cole um link do Vimeo.", "danger")
-                return render_template("admin/events_add.html", form=form)
+
+        image_url = (getattr(form, "image_url", None).data or "").strip() if getattr(form, "image_url", None) else ""
+        vimeo_url = (getattr(form, "vimeo_url", None).data or "").strip() if getattr(form, "vimeo_url", None) else ""
+
+        if kind == "video" and vimeo_url:
+            web_path = vimeo_url
+        elif kind == "image" and image_url:
+            web_path = image_url
         else:
             if not form.file.data:
-                flash("Para imagem: selecione um arquivo.", "danger")
+                msg = "Cole a URL (imagem) ou Vimeo URL (vídeo), ou envie um arquivo."
+                flash(msg, "danger")
                 return render_template("admin/events_add.html", form=form)
-
-        if not web_path:
             try:
-                web_path = save_upload(form.file.data, current_app.config["UPLOAD_FOLDER"], "video" if kind == "video" else "image")
+                web_path = save_upload(
+                    form.file.data,
+                    current_app.config["UPLOAD_FOLDER"],
+                    "video" if kind == "video" else "image",
+                )
             except Exception as e:
                 flash(str(e), "danger")
                 return render_template("admin/events_add.html", form=form)
+
+        item = EventMedia(title=form.title.data or "", kind=kind, position=form.position.data, file_path=web_path)
+        db.session.add(item)
+        db.session.commit()
+        flash("Item adicionado em Events!", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/events_add.html", form=form)
+
 
         item = EventMedia(title=form.title.data or "", kind=kind, position=form.position.data, file_path=web_path)
         db.session.add(item)
@@ -375,23 +413,48 @@ def clients_media_add():
 
     if form.validate_on_submit():
         kind = form.kind.data
-        web_path = ""
-        if kind == "video":
-            web_path = (form.vimeo_url.data or "").strip()
-            if not web_path and not form.file.data:
-                flash("Para vídeo: envie um arquivo ou cole um link do Vimeo.", "danger")
-                return render_template("admin/clients_media_add.html", form=form)
+        image_url = (getattr(form, "image_url", None).data or "").strip() if getattr(form, "image_url", None) else ""
+        vimeo_url = (getattr(form, "vimeo_url", None).data or "").strip() if getattr(form, "vimeo_url", None) else ""
+
+        if kind == "video" and vimeo_url:
+            web_path = vimeo_url
+        elif kind == "image" and image_url:
+            web_path = image_url
         else:
             if not form.file.data:
-                flash("Para imagem: selecione um arquivo.", "danger")
+                flash("Cole a URL (imagem) ou Vimeo URL (vídeo), ou envie um arquivo.", "danger")
                 return render_template("admin/clients_media_add.html", form=form)
-
-        if not web_path:
             try:
-                web_path = save_upload(form.file.data, current_app.config["UPLOAD_FOLDER"], "video" if kind == "video" else "image")
+                web_path = save_upload(
+                    form.file.data,
+                    current_app.config["UPLOAD_FOLDER"],
+                    "video" if kind == "video" else "image",
+                )
             except Exception as e:
                 flash(str(e), "danger")
                 return render_template("admin/clients_media_add.html", form=form)
+
+        if kind == "video":
+            item = ClientVideo(
+                client_id=form.client_id.data,
+                title=form.title.data or "",
+                position=form.position.data,
+                file_path=web_path,
+            )
+        else:
+            item = ClientPhoto(
+                client_id=form.client_id.data,
+                title=form.title.data or "",
+                position=form.position.data,
+                file_path=web_path,
+            )
+        db.session.add(item)
+        db.session.commit()
+        flash("Mídia do cliente adicionada!", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/clients_media_add.html", form=form)
+
 
         if kind == "video":
             item = ClientVideo(
