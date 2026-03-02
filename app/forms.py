@@ -23,6 +23,12 @@ class SettingsForm(FlaskForm):
     about_title = StringField("Título do About", validators=[Optional(), Length(max=120)])
     about_text = TextAreaField("Texto do About", validators=[Optional()])
 
+    about_image_url = StringField(
+        "Foto do About (URL)",
+        validators=[Optional(), Length(max=500)],
+        description="Cole um link de imagem (https://...) ou um caminho do site (/static/...).",
+    )
+
     footer_about = TextAreaField("Texto do footer (About)", validators=[Optional()])
     footer_phone = StringField("Telefone (footer)", validators=[Optional(), Length(max=120)])
     footer_email = StringField("Email (footer)", validators=[Optional(), Length(max=120)])

@@ -25,6 +25,9 @@ class SiteSetting(db.Model):
         ),
     )
 
+    # About page image (URL). Stored as-is, can be absolute (https://...) or relative (/static/...).
+    about_image_url = db.Column(db.String(500), default="")
+
     # Branding
     brand_logo_path = db.Column(db.String(255), default="")  # /static/uploads/...
 

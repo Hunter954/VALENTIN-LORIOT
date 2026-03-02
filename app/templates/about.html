@@ -29,8 +29,18 @@
   <div class="section-inner">
     <h1 class="section-title">ABOUT US</h1>
     <h2 class="section-title" style="margin-top:10px;">{{ settings.about_title if settings else "VALENTIN LORIOT" }}</h2>
-    <div class="about-text" style="margin-top:20px;">
-      {{ (settings.about_text if settings else "") | replace('\n','<br/>') | safe }}
+    <div class="about-grid" style="margin-top:26px;">
+      <div class="about-copy">
+        <div class="about-text">
+          {{ (settings.about_text if settings else "") | replace('\n','<br/>') | safe }}
+        </div>
+      </div>
+
+      {% if settings and settings.about_image_url %}
+        <div class="about-photo">
+          <img src="{{ settings.about_image_url }}" alt="About photo" />
+        </div>
+      {% endif %}
     </div>
   </div>
 </section>

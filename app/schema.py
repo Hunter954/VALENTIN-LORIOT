@@ -22,7 +22,14 @@ from . import db
 #     ]
 #   }
 # ]
-SCHEMA_UPDATES: list[dict] = []
+SCHEMA_UPDATES: list[dict] = [
+    {
+        "table": "site_settings",
+        "columns": [
+            ("about_image_url", "VARCHAR(500)", "DEFAULT ''"),
+        ],
+    }
+]
 
 
 def _has_table(table_name: str) -> bool:
