@@ -27,11 +27,15 @@
 
 <section class="section about section-overlay" style="padding-top:140px;">
   <div class="section-inner">
-    <h1 class="section-title">ABOUT US</h1>
-    <h2 class="section-title" style="margin-top:10px;">{{ settings.about_title if settings else "VALENTIN LORIOT" }}</h2>
+    <h1 class="section-title" style="text-align:left;">ABOUT US</h1>
+
     <div class="about-grid" style="margin-top:26px;">
-      <div class="about-copy">
-        <div class="about-text">
+      <div class="about-copy" style="display:flex; flex-direction:column; align-items:flex-start; text-align:left;">
+        <h2 class="section-title" style="margin:0 0 18px 0; text-align:left;">
+          {{ settings.about_title if settings else "VALENTIN LORIOT" }}
+        </h2>
+
+        <div class="about-text" style="text-align:left;">
           {{ (settings.about_text if settings else "") | replace('\n','<br/>') | safe }}
         </div>
       </div>
