@@ -36,7 +36,7 @@
           {% set is_vimeo = ('vimeo.com' in v.file_path) or ('player.vimeo.com' in v.file_path) %}
           <a href="#" class="media-popup-link" data-popup="1" data-type="{{ 'vimeo' if is_vimeo else 'video' }}" data-src="{{ v.file_path }}">
             {% if is_vimeo %}
-              <div class="works-video vimeo-placeholder" aria-label="Vimeo video">
+              <div class="works-video vimeo-placeholder" data-vimeo-url="{{ v.file_path }}" aria-label="Vimeo video">
                 <span class="vimeo-play"><i class="fa-solid fa-play"></i></span>
               </div>
             {% else %}
@@ -92,8 +92,8 @@
   .media-modal__backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.75); }
   .media-modal__content {
     position: relative;
-    width: min(1000px, calc(100% - 24px));
-    margin: 60px auto;
+    width: min(1400px, calc(100% - 24px));
+    margin: 40px auto;
     background: #0b0b0b;
     border: 1px solid rgba(255,255,255,.12);
     border-radius: 14px;
@@ -109,7 +109,8 @@
     color: #fff; font-size: 22px; cursor: pointer;
   }
   .media-modal__img { width: 100%; height: auto; border-radius: 10px; }
-  .media-modal__video { width: 100%; max-height: 70vh; border-radius: 10px; }
+  /* NOTE: iframes need an explicit height; aspect-ratio solves the "tiny popup" Vimeo issue */
+  .media-modal__video { width: 100%; aspect-ratio: 16 / 9; height: auto; max-height: 80vh; border-radius: 10px; }
   .works-item a.media-popup-link { display:block; color: inherit; text-decoration:none; }
   .vimeo-placeholder {
     position: relative;
@@ -117,10 +118,24 @@
     aspect-ratio: 16 / 9;
     border-radius: 10px;
     background: rgba(255,255,255,.06);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     border: 1px solid rgba(255,255,255,.10);
     display: grid;
     place-items: center;
+    overflow: hidden;
   }
+  .vimeo-placeholder::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.55));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .2s ease;
+  }
+  .vimeo-placeholder.is-thumb::after { opacity: 1; }
   .vimeo-play {
     width: 54px; height: 54px;
     border-radius: 999px;
@@ -211,6 +226,42 @@
       if (!src) return;
       openModal({ type, src, poster });
     });
+
+    // Load Vimeo thumbnails for pages that use placeholders (Portfolio/Clients/Events etc.)
+    const vimeoThumbCache = new Map();
+    async function getVimeoThumb(url) {
+      if (!url) return null;
+      if (vimeoThumbCache.has(url)) return vimeoThumbCache.get(url);
+      try {
+        const res = await fetch(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`);
+        if (!res.ok) throw new Error("oembed failed");
+        const data = await res.json();
+        const thumb = data && (data.thumbnail_url || data.thumbnail_url_with_play_button);
+        vimeoThumbCache.set(url, thumb || null);
+        return thumb || null;
+      } catch (_) {
+        vimeoThumbCache.set(url, null);
+        return null;
+      }
+    }
+
+    async function applyVimeoThumbs() {
+      const els = Array.from(document.querySelectorAll(".vimeo-placeholder[data-vimeo-url]"));
+      for (const el of els) {
+        const url = el.getAttribute("data-vimeo-url") || "";
+        const thumb = await getVimeoThumb(url);
+        if (!thumb) continue;
+        el.style.backgroundImage = `url('${thumb.replace(/'/g, "\\'")}')`;
+        el.classList.add("is-thumb");
+      }
+    }
+
+    // Fire after first paint
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", applyVimeoThumbs, { once: true });
+    } else {
+      applyVimeoThumbs();
+    }
   })();
 </script>
 {% endblock %}
