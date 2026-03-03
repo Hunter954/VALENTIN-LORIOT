@@ -5,6 +5,49 @@
  * - Transição suave "Apple-like" quando o usuário tenta passar do último hero video
  */
 (function () {
+  // =========================
+  // MOBILE MENU (todas as páginas)
+  // =========================
+  function initMobileMenu(){
+    const toggle = document.querySelector('.menu-toggle');
+    const drawer = document.querySelector('.mobile-drawer');
+    const backdrop = document.querySelector('[data-mobile-backdrop]');
+    const closeBtn = document.querySelector('.mobile-close');
+    if (!toggle || !drawer || !backdrop || !closeBtn) return;
+
+    function open(){
+      drawer.classList.add('open');
+      backdrop.classList.add('open');
+      document.body.classList.add('mobile-menu-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      drawer.setAttribute('aria-hidden', 'false');
+    }
+    function close(){
+      drawer.classList.remove('open');
+      backdrop.classList.remove('open');
+      document.body.classList.remove('mobile-menu-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      drawer.setAttribute('aria-hidden', 'true');
+    }
+
+    toggle.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    backdrop.addEventListener('click', close);
+
+    drawer.addEventListener('click', (e)=>{
+      const a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (a) close();
+    });
+
+    window.addEventListener('keydown', (e)=>{
+      if (e.key === 'Escape') close();
+    });
+  }
+  initMobileMenu();
+
+  // =========================
+  // HERO (só na home)
+  // =========================
   const scroller = document.getElementById("heroScroller");
   const heroSection = document.getElementById("home");
   if (!scroller || !heroSection) return;
